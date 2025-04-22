@@ -96,6 +96,10 @@ def convert_to_ananta_hosts(ssh_path: Path, relocate: Path | None) -> List[Anant
                         found_header_host = False
                         continue
                 case "proxycommand" | "proxyjump":
+                    print(f"""
+WARN: SSH host {alias} is configured with ProxyCommand/ProxyJump. Ananta does not support these configurations currently,
+which may prevent you from connecting to this host.
+""")
                     alias = f"{alias}-needs-proxy"
                 case _:
                     pass
