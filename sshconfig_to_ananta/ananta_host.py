@@ -35,8 +35,11 @@ class AnantaHost:
     username: str
     key_path: str
     tags: List[str]
+    relocate: Path | None
 
-    def __init__(self, alias: str, ip: str, port: str, username: str, key_path: str, tags: List[str]):
+    def __init__(
+        self, alias: str, ip: str, port: str, username: str, key_path: str, tags: List[str], relocate: Path | None
+    ):
         _err_msg = f"""
   alias: {alias}
   ip: {ip}
@@ -44,6 +47,7 @@ class AnantaHost:
   username: {username}
   key_path: {key_path}
   tags: {tags}
+  relocate: {relocate}
 """
 
         if not alias:
@@ -64,9 +68,13 @@ class AnantaHost:
         self.username = username if username else "root"
 
         if key_path:
-            if not Path(key_path).is_file():
+            path_key_path = Path(key_path)
+            if relocate:
+                path_key_path = relocate / path_key_path.name
+                key_path = str(path_key_path)
+            if not path_key_path.is_file():
                 raise FileNotFoundError(
-                    f"ERROR: SSH Key {key_path} could not be found OR is not a regular file.{_err_msg}"
+                    f"ERROR: SSH Key {key_path} could not be found OR it is not a regular file.{_err_msg}"
                 )
             self.key_path = key_path
         else:

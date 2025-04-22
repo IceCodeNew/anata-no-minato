@@ -40,8 +40,9 @@ if [[ -n "$_HOSTS_CSV" ]]; then
     hosts_file="/home/nonroot/$(basename "$_HOSTS_CSV")"
 else
     echo "INFO: Will try to generate one using the SSH config..."
-    python3 /home/nonroot/sshconfig_to_ananta/main.py \
+    /home/nonroot/sshconfig_to_ananta/main.py \
         --ssh /home/nonroot/.ssh/config \
+        --relocate /home/nonroot/.ssh/ \
         "$hosts_file"
 fi
 
