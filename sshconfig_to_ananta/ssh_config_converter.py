@@ -26,7 +26,7 @@ def _pop_valid_line(ssh_lines: List[str]) -> str | None:
     if ssh_lines:
         line = ananta_tags_pattern.sub("ananta-tags ", ssh_lines.pop(0))
         if not skip_pattern.match(line):
-            line = line.strip().lower()
+            line = line.strip()
             if line:
                 return line
 
@@ -67,6 +67,7 @@ def convert_to_ananta_hosts(ssh_path: Path, relocate: Path | None) -> List[Anant
             continue
 
         _key, _value = line.split(maxsplit=1)
+        _key = _key.lower()
         if found_header_host:
             match _key:
                 case "host":
