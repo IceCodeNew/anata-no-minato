@@ -9,6 +9,8 @@ FROM gcr.io/distroless/python3:latest
 COPY --link --chmod=0755 ./docker-entrypoint.sh /usr/local/bin/
 # toybox + bash(ash) + catatonit
 COPY --link --from=assets /usr/bin/             /usr/bin/
+
+COPY --link --chmod=0755 ./sshconfig_to_ananta/ /home/nonroot/sshconfig_to_ananta/
 COPY --link --from=build  /home/nonroot/.local/ /home/nonroot/.local/
 
 SHELL ["/usr/bin/bash", "-o", "pipefail", "-c"]
