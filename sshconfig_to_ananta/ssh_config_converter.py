@@ -30,11 +30,11 @@ def _parse_valid_line(line: str) -> Optional[Tuple[str, str]]:
     if skip_pattern.match(line):
         return None
 
-    try:
-        key, value = line.strip().split(maxsplit=1)
-        return key.lower(), value
-    finally:
+    parts = line.strip().split(maxsplit=1)
+    if len(parts) != 2:
         return None
+    key, value = parts
+    return key.lower(), value
 
 
 def _valid_host(alias: str) -> bool:
@@ -92,7 +92,7 @@ def convert_to_ananta_hosts(
                 case "identityfile":
                     key_path = _value
                 case "ananta-tags":
-                    tags: List[str] = re.split(r"[,:]+", _value)
+                    tags = re.split(r"[,:]+", _value)
                     if _host_disabled(tags):
                         found_header_host = False
                         continue

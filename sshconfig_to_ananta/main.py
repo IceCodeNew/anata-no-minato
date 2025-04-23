@@ -3,9 +3,16 @@
 
 import argparse
 import logging
+import sys
 from pathlib import Path
 
 from ssh_config_converter import convert_to_ananta_hosts
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 
 def parse_arguments():
@@ -34,20 +41,23 @@ def parse_arguments():
 
 if __name__ == "__main__":
     args = parse_arguments()
-    ssh_path = Path(args.ssh)
-    csvfile = Path(args.csvfile)
+    ssh_path = args.ssh
+    csvfile = args.csvfile
     relocate = Path(args.relocate).resolve(strict=True) if args.relocate else None
 
     if csvfile.is_dir() or csvfile.is_symlink():
         raise IsADirectoryError(
             f"ERROR: {csvfile} is a directory OR a symlink. Script aborted to prevent data loss."
         )
+    if relocate and not relocate.is_dir():
+        raise NotADirectoryError(f"ERROR: relocate path {relocate} is not a directory.")
+
     # ssh_path will be valided in convert_to_ananta_hosts()
     try:
         ananta_hosts = convert_to_ananta_hosts(ssh_path, relocate)
     except Exception as e:
-        logging.error(f"Failed to convert SSH config to Ananta hosts: {e}")
-        exit(1)
+        logging.error("Failed to convert SSH config to Ananta hosts: %s", e)
+        sys.exit(1)
 
     try:
         with open(csvfile, "w", encoding="utf-8") as file:

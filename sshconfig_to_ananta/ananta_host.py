@@ -96,7 +96,7 @@ class AnantaHost:
             f"  port:     {str(self.port)}\n"
             f"  username: {self.username}\n"
             f"  key_path: {self.key_path}\n"
-            f"  tags:     {', '.join(self.tags)}\n"
+            f"  tags:     {','.join(self.tags)}\n"
         )
 
     def to_string(self) -> str:
