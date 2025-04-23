@@ -2,6 +2,8 @@
 
 [English](README.md) | [中文](README_zh-Hans.md) | [日本語](README_ja.md)  
   
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/IceCodeNew/anata-no-minato?utm_source=oss&utm_medium=github&utm_campaign=IceCodeNew%2Fanata-no-minato&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+  
 这个项目将 [Ananta](https://github.com/cwt/ananta) 及其所需的完整运行时打包到一个极简的、安全加固过的容器镜像中，并带上了一些自动化脚本来简化使用体验。  
 在使用该项目时，推荐将 `${HOME}/.ssh/` 挂载到容器中，容器会自动根据 `~/.ssh/config` 生成 `hosts.csv` 文件。  
   
@@ -13,7 +15,7 @@
 而 `ananta` 这个名字不是中文或日文讲话者习惯的发音，恰好省略掉一个 `n` 以后这个词就成了日语的 `anata`，这样我敲到第四个字母的时候就能跳转到这个项目了。  
 而 `minato` 这个词在日语中可以表示“港口”的意思，可以从 docker 联想过来。这样一组合就得到了一首日本经典演歌的歌名。敬请欣赏：  
   
-[![](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://www.youtube.com/embed/sCRvjlTX8Fw)
+[![あなたのみなと～いい夫婦～ 松前ひろ子（2001）](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://youtu.be/sCRvjlTX8Fw)
 
 ## 如何开始
 

@@ -2,6 +2,8 @@
 
 [English](README.md) | [中文](README_zh-Hans.md) | [日本語](README_ja.md)  
   
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/IceCodeNew/anata-no-minato?utm_source=oss&utm_medium=github&utm_campaign=IceCodeNew%2Fanata-no-minato&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+  
 このプロジェクトは、[Ananta](https://github.com/cwt/ananta) とその完全なランタイム環境を内包した状態で、最小限のコンテナイメージを作成したものです。セキュリティを強化しつつ、不便さを感じさせないよう自動化スクリプトを導入し、操作性を向上させました。  
 利用時には `${HOME}/.ssh/` ディレクトリをコンテナ内にマウントすることを推奨します。コンテナは `~/.ssh/config` に基づいて `hosts.csv` を自動生成します。  
   
@@ -13,7 +15,7 @@
 「ananta」は、中国語や日本語話者にとってあまり馴染みのない発音ですが、「n」を一文字省略すると、日本語の「anata（あなた）」に似た読みになることに気付きました。これにより、4 文字目まで入力すればこのプロジェクトに移動できるようになります。  
 「minato（港）」は、コンテナ（Docker）が港に停泊する船のように見えることから着想を得たものです。この二つの言葉を組み合わせた結果、日本で広く知られる某有名演歌のタイトルになりました。ぜひご堪能ください：  
   
-[![](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://www.youtube.com/embed/sCRvjlTX8Fw)
+[![あなたのみなと～いい夫婦～ 松前ひろ子（2001）](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://youtu.be/sCRvjlTX8Fw)
 
 ## 使い始め方
 
