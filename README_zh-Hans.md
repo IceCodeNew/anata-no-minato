@@ -3,6 +3,7 @@
 [English](README.md) | [中文](README_zh-Hans.md) | [日本語](README_ja.md)  
   
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/IceCodeNew/anata-no-minato?utm_source=oss&utm_medium=github&utm_campaign=IceCodeNew%2Fanata-no-minato&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+[![CodeQL](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/github-code-scanning/codeql)
   
 这个项目将 [Ananta](https://github.com/cwt/ananta) 及其所需的完整运行时打包到一个极简的、安全加固过的容器镜像中，并带上了一些自动化脚本来简化使用体验。  
 在使用该项目时，推荐将 `${HOME}/.ssh/` 挂载到容器中，容器会自动根据 `~/.ssh/config` 生成 `hosts.csv` 文件。  
