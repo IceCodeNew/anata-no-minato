@@ -3,6 +3,8 @@ on:
   push:
     branches:
     - 'master'
+    paths-ignore:
+    - 'sshconfig_to_ananta/test_**'
     paths:
     - '.github/workflows/ananta.yml'
     - 'sshconfig_to_ananta/**'
