@@ -3,10 +3,9 @@ on:
   push:
     branches:
     - 'master'
-    paths-ignore:
-    - 'sshconfig_to_ananta/test_**'
     paths:
     - 'sshconfig_to_ananta/**'
+    - '!sshconfig_to_ananta/test_**'
     - 'docker-entrypoint.sh'
     - 'Dockerfile'
   schedule:
