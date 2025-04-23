@@ -1,0 +1,28 @@
+name: Unittest
+
+on:
+  push:
+    branches:
+    - 'master'
+    paths:
+    - 'sshconfig_to_ananta/**'
+  pull_request:
+    paths:
+    - 'sshconfig_to_ananta/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Unit test
+      run: |
+        cd sshconfig_to_ananta || exit 1
+        python3 -m unittest test_*

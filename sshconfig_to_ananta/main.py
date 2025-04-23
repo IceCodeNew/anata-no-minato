@@ -39,7 +39,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = parse_arguments()
     ssh_path = args.ssh
     csvfile = args.csvfile
@@ -66,3 +66,7 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"Failed to write to {csvfile}: {e}")
         raise
+
+
+if __name__ == "__main__":
+    main()
