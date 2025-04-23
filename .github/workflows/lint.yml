@@ -1,0 +1,59 @@
+name: Linter
+
+on:
+    push:
+      branches:
+      - 'master'
+    pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    # python-lint
+    - name: Install the latest version of ruff
+      uses: astral-sh/ruff-action@v3
+      with:
+        version: "latest"
+        args: "format --check --diff"
+    - name: Run Ruff linter
+      run: |
+        # check the formatted codes
+        ruff check --select I --fix
+        ruff format
+        # run the linters
+        ruff check .
+    # shell-lint
+    - name: shellcheck
+      uses: reviewdog/action-shellcheck@v1
+      with:
+        reporter: github-check
+    # Dockerfile lint
+    - name: hadolint
+      uses: reviewdog/action-hadolint@v1
+      with:
+        hadolint_ignore: DL3007 SC2114
+        reporter: github-check
+    # actionlint
+    - name: actionlint
+      uses: reviewdog/action-actionlint@v1
+      with:
+        reporter: github-check
+
+    # misspell
+    - name: misspell
+      uses: reviewdog/action-misspell@v1
+      with:
+        locale: "US"
+        reporter: github-check
+    # AutoCorrect
+    - name: AutoCorrect
+      uses: huacnlee/autocorrect-action@v2
+    - name: Report ReviewDog
+      if: failure()
+      uses: huacnlee/autocorrect-action@v2
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        reviewdog: true
