@@ -2,7 +2,7 @@
 # pyright: strict
 
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 
 class AnantaHost:
@@ -35,7 +35,7 @@ class AnantaHost:
     username: str
     key_path: str
     tags: List[str]
-    relocate: Path | None
+    relocate: Optional[Path]
 
     def __init__(
         self,
@@ -45,7 +45,7 @@ class AnantaHost:
         username: str,
         key_path: str,
         tags: List[str],
-        relocate: Path | None,
+        relocate: Optional[Path],
     ):
         _err_msg = f"""
   alias: {alias}
@@ -66,43 +66,41 @@ class AnantaHost:
         self.ip = ip
 
         try:
-            self.port = int(port) if str(port) else 22
+            self.port = int(port) if port else 22
             if not (0 < self.port < 65536):
                 raise ValueError(
                     f"ERROR: Port number {port} must be greater than 0 and less than 65536.{_err_msg}"
                 )
-        except ValueError as e:
+        except (ValueError, TypeError) as e:
             raise ValueError(f"ERROR: Invalid port number: {port}.{_err_msg}") from e
 
         self.username = username if username else "root"
 
-        if key_path:
-            path_key_path = Path(key_path)
-            if relocate:
-                path_key_path = relocate / path_key_path.name
-                key_path = str(path_key_path)
-            if not path_key_path.is_file():
+        self.key_path = key_path if key_path else "#"
+        if key_path and relocate:
+            key_path_obj = relocate / Path(key_path).name
+            if not key_path_obj.is_file():
                 raise FileNotFoundError(
                     f"ERROR: SSH Key {key_path} could not be found OR it is not a regular file.{_err_msg}"
                 )
-            self.key_path = key_path
-        else:
-            self.key_path = "#"
+            self.key_path = str(key_path_obj)
 
         self.tags = tags if tags else []
 
-    def to_string_with_feilds(self) -> str:
+        self.relocate = relocate if isinstance(relocate, Path) else None
+
+    def to_string_with_fields(self) -> str:
         return (
             f"  alias:    {self.alias}\n"
             f"  ip:       {self.ip}\n"
-            f"  port:     {self.port}\n"
+            f"  port:     {str(self.port)}\n"
             f"  username: {self.username}\n"
             f"  key_path: {self.key_path}\n"
-            f"  tags:     {self.tags}\n"
+            f"  tags:     {', '.join(self.tags)}\n"
         )
 
     def to_string(self) -> str:
-        parts = [self.alias, str(self.ip), str(self.port), self.username, self.key_path]
+        parts = [self.alias, self.ip, str(self.port), self.username, self.key_path]
         if self.tags:
             parts.append(":".join(self.tags))
         return ",".join(parts) + "\n"
