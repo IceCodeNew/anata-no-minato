@@ -72,7 +72,9 @@ def convert_to_ananta_hosts(ssh_path: Path, relocate: Path | None) -> List[Anant
             match _key:
                 case "host":
                     # End of the previous host.
-                    ananta_hosts.append(AnantaHost(alias, ip, port, username, key_path, tags, relocate))
+                    ananta_hosts.append(
+                        AnantaHost(alias, ip, port, username, key_path, tags, relocate)
+                    )
 
                     if not _valid_host(_value):
                         found_header_host = False
@@ -121,5 +123,7 @@ which may prevent you from connecting to this host.
                 pass
 
     if _valid_host(alias):
-        ananta_hosts.append(AnantaHost(alias, ip, port, username, key_path, tags, relocate))
+        ananta_hosts.append(
+            AnantaHost(alias, ip, port, username, key_path, tags, relocate)
+        )
     return ananta_hosts

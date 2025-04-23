@@ -38,7 +38,14 @@ class AnantaHost:
     relocate: Path | None
 
     def __init__(
-        self, alias: str, ip: str, port: str, username: str, key_path: str, tags: List[str], relocate: Path | None
+        self,
+        alias: str,
+        ip: str,
+        port: str,
+        username: str,
+        key_path: str,
+        tags: List[str],
+        relocate: Path | None,
     ):
         _err_msg = f"""
   alias: {alias}
@@ -61,7 +68,9 @@ class AnantaHost:
         try:
             self.port = int(port) if str(port) else 22
             if not (0 < self.port < 65536):
-                raise ValueError(f"ERROR: Port number {port} must be greater than 0 and less than 65536.{_err_msg}")
+                raise ValueError(
+                    f"ERROR: Port number {port} must be greater than 0 and less than 65536.{_err_msg}"
+                )
         except ValueError as e:
             raise ValueError(f"ERROR: Invalid port number: {port}.{_err_msg}") from e
 
