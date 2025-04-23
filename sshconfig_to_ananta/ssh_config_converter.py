@@ -25,16 +25,19 @@ def _read_ssh_config(ssh_path: Path) -> Iterator[str]:
 
 def _parse_valid_line(line: str) -> Optional[Tuple[str, str]]:
     ananta_tags_pattern = re.compile(r"^\s+#tags\s+", re.IGNORECASE)
+    comment_pattern = re.compile(r"\s*#.*")
     skip_pattern = re.compile(r"^\s*[#$]")
+
     line = ananta_tags_pattern.sub("ananta-tags ", line)
     if skip_pattern.match(line):
         return None
-
     parts = line.strip().split(maxsplit=1)
     if len(parts) != 2:
         return None
-    key, value = parts
-    return key.lower(), value
+
+    _key = parts[0].lower()
+    _value = comment_pattern.sub("", parts[1])
+    return _key, _value
 
 
 def _valid_host(alias: str) -> bool:
