@@ -46,7 +46,7 @@ In case you want to specify an existing hosts.csv,
         exit 0
         ;;
     --run-in-ci)
-        docker_run_args=()
+        docker_run_args=('--network' 'host')
         shift
         ;;
     -[nNsSeEcCvV]|--no-color|--separate-output|--allow-empty-line|--allow-cursor-control|--version)
@@ -98,4 +98,5 @@ docker run --rm \
     --cpu-shares 512 --memory 512M --memory-swap 512M \
     --security-opt no-new-privileges \
     icecodexi/ananta:latest "$absolute_hosts_csv" \
-        "${inputs[@]}" "${append[@]}"
+        "${inputs[@]}" "${append[@]}" \
+    || exit 1
