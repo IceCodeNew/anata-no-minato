@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/checkout@v4
 
-      - name: Build the latest variant to the local docker daemon
+      - name: Build and load Docker image to local daemon
         uses: docker/build-push-action@v6
         with:
           load: true
@@ -58,7 +58,7 @@ jobs:
           docker save -o "ananta.${{ matrix.variant }}.tar" "${{ env.ananta_repo }}:${{ matrix.variant }}"
 
       - name: Smoke Test
-        if: matrix.variant == 'latest'
+        if: ${{ matrix.variant == 'latest' }}
         run: |
           sudo apt-get update -qq \
               && sudo apt-get -y install \
