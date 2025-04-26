@@ -52,10 +52,10 @@ In case you want to specify an existing hosts.csv,
         inputs+=("$1" "$2")
         shift 2
         ;;
-    [!-]*.csv)
+    [!-]*.[cC][sS][vV])
         might_be_hosts_csv="$1"
         shift
-        # Stop processing remaining arguments
+        # Capture all remaining args (commands) in `append` and exit the parse loop
         append=("$@")
         break
         ;;
