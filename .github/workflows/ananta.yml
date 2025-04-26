@@ -74,7 +74,7 @@ jobs:
           ssh-keygen -t ed25519 -N '' -f "${HOME}/.ssh/ed25519"
           cat "${HOME}/.ssh/ed25519.pub" >> "${HOME}/.ssh/authorized_keys"
           cat << EEOOFF > "${HOME}/.ssh/config"
-          Host localhost
+          Host test-server
               Hostname 127.0.0.1
               User $(whoami)
               IdentityFile ${HOME}/.ssh/ed25519
@@ -82,7 +82,12 @@ jobs:
 
           today=$(date +%Y-%m-%d)
           docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
-          bash -x installer/dummy_ananta.sh --run-in-ci whoami || exit 1
+          bash -x installer/dummy_ananta.sh --run-in-ci whoami \
+              | tee /tmp/smoke-test.log
+          if ! grep -qE '[test-server]\s+runner' /tmp/smoke-test.log; then
+              echo "ERROR: Smoke test failed"
+              exit 1
+          fi
 
           docker save -o "ananta.latest.tar" "${{ env.ananta_repo }}:latest"
 
