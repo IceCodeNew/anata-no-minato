@@ -52,7 +52,7 @@ In case you want to specify an existing hosts.csv,
         inputs+=("$1" "$2")
         shift 2
         ;;
-    [!-]*)
+    [!-]*.csv)
         might_be_hosts_csv="$1"
         shift
         # Stop processing remaining arguments
