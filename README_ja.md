@@ -8,48 +8,46 @@
 このプロジェクトは、[Ananta](https://github.com/cwt/ananta) とその完全なランタイム環境を内包した状態で、最小限のコンテナイメージを作成したものです。セキュリティを強化しつつ、不便さを感じさせないよう自動化スクリプトを導入し、操作性を向上させました。  
 利用時には `${HOME}/.ssh/` ディレクトリをコンテナ内にマウントすることを推奨します。コンテナは `~/.ssh/config` に基づいて `hosts.csv` を自動生成します。  
   
-接続が制限された環境での作業が求められる状況を想定し、エアギャップ環境におけるツールのインストールおよび運用を容易にするために、本プロジェクトを立ち上げました。  
+接続が制限された環境での作業を想定し、エアギャップ環境におけるツールのインストールおよび運用を容易にするために、本プロジェクトを立ち上げました。  
 
 ## なぜ「あなたのみなと」と名付けたのか
 
-私のパソコにはすでに「docker-XXX」という名前の Git リポジトリが多数存在しており、このプロジェクトは、できるだけ少ないキータイプ数で移動できるようにしたかったため、「docker-ananta」という名前は避けたいんです。  
-「ananta」は、中国語や日本語話者にとってあまり馴染みのない発音ですが、「n」を一文字省略すると、日本語の「anata（あなた）」に似た読みになることに気付きました。これにより、4 文字目まで入力すればこのプロジェクトに移動できるようになります。  
-「minato（港）」は、コンテナ（Docker）が港に停泊する船のように見えることから着想を得たものです。この二つの言葉を組み合わせた結果、日本で広く知られる某有名演歌のタイトルになりました。ぜひご堪能ください：  
+私のパソコにはすでに「docker-XXX」という名前の Git リポジトリが多数存在しており、本プロジェクトはできるだけ少ないキー入力で移動できるように「docker-ananta」という名前を避けています。  
+「Ananta」は、中国語や日本語話者にとってあまり馴染みのない発音ですが、「n」を一文字省略すると、日本語の「Anata（あなた）」に似た読みになることに気付きました。これにより、4 文字目まで入力すれば本プロジェクトに移動できるようになります。  
+「Minato（港）」という言葉は、コンテナ（Docker）が港に停泊する船のように見えることから着想を得たものです。これら二つの言葉を組み合わせた結果、日本で広く知られる某有名演歌のタイトルになりました。ぜひご堪能ください：  
   
 [![あなたのみなと～いい夫婦～ 松前ひろ子（2001）](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://youtu.be/sCRvjlTX8Fw)
 
 ## 使い始め方
 
+以下の手順に従って、ananta のヘルパースクリプトをインストールしてください。  
+
 ```shell
-docker pull icecodexi/ananta:latest
-mkdir -p "${HOME}/.ssh/"
-find "${HOME}/.ssh/" -type f -print0 | xargs -0 -r chmod 600
+docker pull icecodexi/ananta:installer
+docker run --rm --interactive --tty \
+    --volume "$(pwd):/tmp/" \
+    --security-opt no-new-privileges \
+    icecodexi/ananta:installer \
+        cp -f /usr/local/bin/ananta /tmp/ananta
 
-_extra_args=()
-if [[ "$UID" -eq '0' ]]; then
-    _extra_args+=('--user' 'root')
-fi
+# スクリプトを実行する前に、内容を確認することを推奨します。
+cat ./ananta
 
-# Will automatic generate hosts.csv based on ~/.ssh/config if it does not exist
-_hosts_csv="$(pwd)/hosts.csv"
-if [[ -f "${_hosts_csv}" ]]; then
-    hosts_csv="${_hosts_csv}"
-    _extra_args+=('--volume' "${_hosts_csv}:/home/nonroot/hosts.csv:ro")
-fi
+sudo install -pvD ./ananta /usr/local/bin/
+rm ./ananta
+```
 
-export _extra_args hosts_csv
-# put this function definition in your ~/.bashrc
-ananta() {
-    docker run --rm --interactive --tty \
-        "${_extra_args[@]}" \
-        --volume /etc/localtime:/etc/localtime:ro \
-        --volume "${HOME}/.ssh/:/home/nonroot/.ssh/:ro" \
-        --cpu-shares 512 --memory 512M --memory-swap 512M \
-        --security-opt no-new-privileges \
-        icecodexi/ananta:latest "$hosts_csv" \
-            "$@"
-}
+このヘルパースクリプトは、`~/.ssh/config` をもとに `hosts.csv` ファイルを自動生成します。  
+これにより、ananta ツールを実行する際に、あらかじめ `hosts.csv` を用意する必要がなくなります。  
+実行例：  
 
-## Example for issuing command `whoami` to multiple hosts
-ananta whoami
+```shell
+ananta -CS fastfetch
+```
+
+なお、`hosts.csv` ファイルを指定したい場合は、公式 ananta ツールと同様のパラメータ順でコマンドを実行してください。  
+実行例：  
+
+```shell
+ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```

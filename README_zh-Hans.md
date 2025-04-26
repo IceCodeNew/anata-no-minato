@@ -13,43 +13,39 @@
 ## 项目如何得名
 
 我电脑上的本地磁盘已经有太多 docker-XXX 命名的 git 仓库了，而我想每次都能少敲几个键就能跳转到这个项目下，所以这个项目不能叫 `docker-ananta`。  
-而 `ananta` 这个名字不是中文或日文讲话者习惯的发音，恰好省略掉一个 `n` 以后这个词就成了日语的 `anata`，这样我敲到第四个字母的时候就能跳转到这个项目了。  
-而 `minato` 这个词在日语中可以表示“港口”的意思，可以从 docker 联想过来。这样一组合就得到了一首日本经典演歌的歌名。敬请欣赏：  
+而 `Ananta` 这个名字不是中文或日文讲话者习惯的发音，恰好省略掉一个 `n` 以后这个词就成了日语的 `Anata（あなた）`，这样我敲到第四个字母的时候就能跳转到这个项目了。  
+而 `Minato（港）` 这个词在日语中可以表示“港口”的意思，可以从 docker 联想过来。两个词组合起来就得到了一首日本经典演歌的歌名。敬请欣赏：  
   
 [![あなたのみなと～いい夫婦～ 松前ひろ子（2001）](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://youtu.be/sCRvjlTX8Fw)
 
 ## 如何开始
 
+以下命令会拉取一个极小的安装镜像，用于在当前系统上安装 `ananta` 的帮助脚本：
+
 ```shell
-docker pull icecodexi/ananta:latest
-mkdir -p "${HOME}/.ssh/"
-find "${HOME}/.ssh/" -type f -print0 | xargs -0 -r chmod 600
+docker pull icecodexi/ananta:installer
+docker run --rm --interactive --tty \
+    --volume "$(pwd):/tmp/" \
+    --security-opt no-new-privileges \
+    icecodexi/ananta:installer \
+        cp -f /usr/local/bin/ananta /tmp/ananta
 
-_extra_args=()
-if [[ "$UID" -eq '0' ]]; then
-    _extra_args+=('--user' 'root')
-fi
+# 建议在执行任何脚本之前，都先检查脚本的内容
+cat ./ananta
 
-# Will automatic generate hosts.csv based on ~/.ssh/config if it does not exist
-_hosts_csv="$(pwd)/hosts.csv"
-if [[ -f "${_hosts_csv}" ]]; then
-    hosts_csv="${_hosts_csv}"
-    _extra_args+=('--volume' "${_hosts_csv}:/home/nonroot/hosts.csv:ro")
-fi
+sudo install -pvD ./ananta /usr/local/bin/
+rm ./ananta
+```
 
-export _extra_args hosts_csv
-# put this function definition in your ~/.bashrc
-ananta() {
-    docker run --rm --interactive --tty \
-        "${_extra_args[@]}" \
-        --volume /etc/localtime:/etc/localtime:ro \
-        --volume "${HOME}/.ssh/:/home/nonroot/.ssh/:ro" \
-        --cpu-shares 512 --memory 512M --memory-swap 512M \
-        --security-opt no-new-privileges \
-        icecodexi/ananta:latest "$hosts_csv" \
-            "$@"
-}
+这个帮助脚本会自动根据 `~/.ssh/config` 生成 `hosts.csv` 文件，这样您执行 ananta 命令时就无需再指定 hosts.csv 文件：  
+（注意这里相比上游的 ananta README，省略了中间的 hosts.csv 参数）  
 
-## Example for issuing command `whoami` to multiple hosts
-ananta whoami
+```shell
+ananta -CS fastfetch
+```
+
+如果您不需要上述功能，可使用和上游一致的参数顺序来指定 hosts.csv 文件，如下所示：  
+
+```shell
+ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```

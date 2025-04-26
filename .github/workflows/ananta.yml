@@ -1,10 +1,16 @@
 name: ananta Image CI
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
 on:
   push:
     branches:
     - 'master'
     paths:
     - '.github/workflows/ananta.yml'
+    - 'installer/**'
     - 'sshconfig_to_ananta/**'
     - '!sshconfig_to_ananta/test_**'
     - 'docker-entrypoint.sh'
@@ -19,6 +25,12 @@ env:
 jobs:
   ananta:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - latest
+          - installer
     steps:
       -
         name: Set up QEMU
@@ -32,24 +44,27 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
       -
         name: Build and push
         uses: docker/build-push-action@v6
         with:
+          context: ${{ matrix.variant == 'installer' && './installer/' || '.' }}
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ env.ananta_repo }}:latest
+          tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ env.ananta_repo }}:latest \
+          docker buildx imagetools inspect ${{ env.ananta_repo }}:${{ matrix.variant }} \
               | grep -Po '[^ \r\n\t\v]+@sha256:[a-z0-9]+' | xargs -r -t -n 1 docker buildx imagetools inspect --raw
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          image-ref: "${{ env.ananta_repo }}:latest"
+          image-ref: "${{ env.ananta_repo }}:${{ matrix.variant }}"
           format: 'table'

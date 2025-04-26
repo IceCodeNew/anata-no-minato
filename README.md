@@ -20,36 +20,33 @@ Meanwhile, `Minato` (みなと) in Japanese means "harbor" - a natural associati
 
 ## How to start
 
+Use this tiny installer image to install a helper script of `ananta`:
+
 ```shell
-docker pull icecodexi/ananta:latest
-mkdir -p "${HOME}/.ssh/"
-find "${HOME}/.ssh/" -type f -print0 | xargs -0 -r chmod 600
+docker pull icecodexi/ananta:installer
+docker run --rm --interactive --tty \
+    --volume "$(pwd):/tmp/" \
+    --security-opt no-new-privileges \
+    icecodexi/ananta:installer \
+        cp -f /usr/local/bin/ananta /tmp/ananta
 
-_extra_args=()
-if [[ "$UID" -eq '0' ]]; then
-    _extra_args+=('--user' 'root')
-fi
+# it is always a good idea to check the content of a script before executing it
+cat ./ananta
 
-# Will automatic generate hosts.csv based on ~/.ssh/config if it does not exist
-_hosts_csv="$(pwd)/hosts.csv"
-if [[ -f "${_hosts_csv}" ]]; then
-    hosts_csv="${_hosts_csv}"
-    _extra_args+=('--volume' "${_hosts_csv}:/home/nonroot/hosts.csv:ro")
-fi
+sudo install -pvD ./ananta /usr/local/bin/
+rm ./ananta
+```
 
-export _extra_args hosts_csv
-# put this function definition in your ~/.bashrc
-ananta() {
-    docker run --rm --interactive --tty \
-        "${_extra_args[@]}" \
-        --volume /etc/localtime:/etc/localtime:ro \
-        --volume "${HOME}/.ssh/:/home/nonroot/.ssh/:ro" \
-        --cpu-shares 512 --memory 512M --memory-swap 512M \
-        --security-opt no-new-privileges \
-        icecodexi/ananta:latest "$hosts_csv" \
-            "$@"
-}
+This helper script will automatically generate hosts.csv based on `~/.ssh/config`, issue the command as below:  
+(omit the hosts.csv argument)  
 
-## Example for issuing command `whoami` to multiple hosts
-ananta whoami
+```shell
+ananta -CS fastfetch
+```
+
+In case you want to specify an existing hosts.csv,  
+   issue the command with the same arguments sequence as the original ananta command:  
+
+```shell
+ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```
