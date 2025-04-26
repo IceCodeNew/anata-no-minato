@@ -73,7 +73,7 @@ jobs:
 
           today=$(date +%Y-%m-%d)
           docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
-          bash -x installer/dummy_ananta.sh whoami
+          bash -x installer/dummy_ananta.sh --run-in-ci whoami
 
           docker save -o "ananta.latest.tar" "${{ env.ananta_repo }}:latest"
 

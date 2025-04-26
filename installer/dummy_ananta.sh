@@ -29,8 +29,12 @@ get_latest_ananta_image() {
 # parse arguments
 inputs=()
 append=()
+docker_run_args=('--interactive' '--tty')
 while [[ $# -gt 0 ]]; do
     case "$1" in
+    --run-in-ci)
+        docker_run_args=()
+        ;;
     -[hH]|--help)
         # shellcheck disable=SC2016
         echo '
@@ -67,7 +71,6 @@ In case you want to specify an existing hosts.csv,
 done
 
 # main function
-docker_run_args=()
 
 # Allow the nonroot user in the container to read files under ${HOME}/.ssh/ of other users
 if [[ "$UID" -ne 65532 ]]; then
@@ -87,7 +90,7 @@ mkdir -p "${HOME}/.ssh/"
 find "${HOME}/.ssh/" -type f -print0 | xargs -0 -r chmod 600
 get_latest_ananta_image
 
-docker run --rm --interactive --tty \
+docker run --rm \
     "${docker_run_args[@]}" \
     --volume /etc/localtime:/etc/localtime:ro \
     --volume "${HOME}/.ssh/:/home/nonroot/.ssh/:ro" \
