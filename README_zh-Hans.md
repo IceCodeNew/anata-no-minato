@@ -10,14 +10,6 @@
   
 由于经常需要在没有外网的环境中工作，我创建了这个项目用来方便在气隙环境中安装和使用 Ananta。  
 
-## 项目如何得名
-
-我电脑上的本地磁盘已经有太多 docker-XXX 命名的 git 仓库了，而我想每次都能少敲几个键就能跳转到这个项目下，所以这个项目不能叫 `docker-ananta`。  
-而 `Ananta` 这个名字不是中文或日文讲话者习惯的发音，恰好省略掉一个 `n` 以后这个词就成了日语的 `Anata（あなた）`，这样我敲到第四个字母的时候就能跳转到这个项目了。  
-而 `Minato（港）` 这个词在日语中可以表示“港口”的意思，可以从 docker 联想过来。两个词组合起来就得到了一首日本经典演歌的歌名。敬请欣赏：  
-  
-[![あなたのみなと～いい夫婦～ 松前ひろ子（2001）](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://youtu.be/sCRvjlTX8Fw)
-
 ## 如何开始
 
 以下命令会拉取一个极小的安装镜像，用于在当前系统上安装 `ananta` 的帮助脚本：
@@ -49,3 +41,11 @@ ananta -CS fastfetch
 ```shell
 ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```
+
+## 项目如何得名
+
+我电脑上的本地磁盘已经有太多 docker-XXX 命名的 git 仓库了，而我想每次都能少敲几个键就能跳转到这个项目下，所以这个项目不能叫 `docker-ananta`。  
+而 `Ananta` 这个名字不是中文或日文讲话者习惯的发音，恰好省略掉一个 `n` 以后这个词就成了日语的 `Anata（あなた）`，这样我敲到第四个字母的时候就能跳转到这个项目了。  
+而 `Minato（港）` 这个词在日语中可以表示“港口”的意思，可以从 docker 联想过来。两个词组合起来就得到了一首日本经典演歌的歌名。敬请欣赏：  
+  
+[![あなたのみなと～いい夫婦～ 松前ひろ子（2001）](https://i.ytimg.com/vi/sCRvjlTX8Fw/maxresdefault.jpg)](https://youtu.be/sCRvjlTX8Fw)
