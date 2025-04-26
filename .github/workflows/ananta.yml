@@ -36,9 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant:
-          - latest
-          - installer
+        variant: ${{ github.event_name == 'pull_request' && fromJson('["latest"]') || fromJson('["latest","installer"]') }}
     steps:
       -
         name: Set up QEMU
