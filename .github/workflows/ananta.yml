@@ -46,17 +46,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/checkout@v4
 
-      - name: Build and load Docker image to local daemon
+      - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@v6
+        if: ${{ matrix.variant == 'latest' }}
         with:
           load: true
-          tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
+          tags: ${{ env.ananta_repo }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Save the docker images as tarball
-        run: |
-          docker save -o "ananta.${{ matrix.variant }}.tar" "${{ env.ananta_repo }}:${{ matrix.variant }}"
-
       - name: Smoke Test
         if: ${{ matrix.variant == 'latest' }}
         run: |
@@ -78,6 +75,8 @@ jobs:
           docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
           bash -x installer/dummy_ananta.sh whoami
 
+          docker save -o "ananta.latest.tar" "${{ env.ananta_repo }}:latest"
+
       -
         name: Build and push
         uses: docker/build-push-action@v6
@@ -91,6 +90,7 @@ jobs:
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
+        if: ${{ matrix.variant == 'latest' }}
         with:
           input: "ananta.${{ matrix.variant }}.tar"
           format: 'table'
