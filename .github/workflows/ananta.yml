@@ -44,8 +44,40 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - uses: actions/checkout@v4
+
+      - name: Build and load Docker image to local daemon
+        uses: docker/build-push-action@v6
+        with:
+          load: true
+          tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Save the docker images as tarball
+        run: |
+          docker save -o "ananta.${{ matrix.variant }}.tar" "${{ env.ananta_repo }}:${{ matrix.variant }}"
+
+      - name: Smoke Test
+        if: ${{ matrix.variant == 'latest' }}
+        run: |
+          sudo apt-get update -qq \
+              && sudo apt-get -y install \
+                  openssh-client openssh-server \
+              && sudo systemctl start ssh.service
+
+          mkdir -p "${HOME}/.ssh/"
+          ssh-keygen -t ed25519 -N '' -f "${HOME}/.ssh/ed25519"
+          cat "${HOME}/.ssh/ed25519.pub" >> "${HOME}/.ssh/authorized_keys"
+          cat << EEOOFF > "${HOME}/.ssh/config"
+          Host localhost
+              Hostname 127.0.0.1
+              User $(whoami)
+          EEOOFF
+
+          today=$(date +%Y-%m-%d)
+          docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
+          bash -x installer/dummy_ananta.sh whoami
+
       -
         name: Build and push
         uses: docker/build-push-action@v6
@@ -56,15 +88,9 @@ jobs:
           tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      -
-        name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ env.ananta_repo }}:${{ matrix.variant }} \
-              | grep -Po '[^ \r\n\t\v]+@sha256:[a-z0-9]+' | xargs -r -t -n 1 docker buildx imagetools inspect --raw
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          image-ref: "${{ env.ananta_repo }}:${{ matrix.variant }}"
+          input: "ananta.${{ matrix.variant }}.tar"
           format: 'table'
