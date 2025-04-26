@@ -15,6 +15,14 @@ on:
     - '!sshconfig_to_ananta/test_**'
     - 'docker-entrypoint.sh'
     - 'Dockerfile'
+  pull_request:
+    paths:
+    - '.github/workflows/ananta.yml'
+    - 'installer/dummy_ananta.sh'
+    - 'sshconfig_to_ananta/**'
+    - '!sshconfig_to_ananta/test_**'
+    - 'docker-entrypoint.sh'
+    - 'Dockerfile'
   schedule:
   - cron: "0 5 1-31/10 * *"
   workflow_dispatch:
@@ -28,9 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant:
-          - latest
-          - installer
+        variant: ${{ github.event_name == 'pull_request' && fromJson('["latest"]') || fromJson('["latest","installer"]') }}
     steps:
       -
         name: Set up QEMU
@@ -66,7 +72,7 @@ jobs:
           ssh-keygen -t ed25519 -N '' -f "${HOME}/.ssh/ed25519"
           cat "${HOME}/.ssh/ed25519.pub" >> "${HOME}/.ssh/authorized_keys"
           cat << EEOOFF > "${HOME}/.ssh/config"
-          Host localhost
+          Host testServer
               Hostname 127.0.0.1
               User $(whoami)
               IdentityFile ${HOME}/.ssh/ed25519
@@ -74,13 +80,29 @@ jobs:
 
           today=$(date +%Y-%m-%d)
           docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
-          bash -x installer/dummy_ananta.sh --run-in-ci whoami || exit 1
+
+          #1: no hosts.csv; ananta arguments specified
+          bash -x installer/dummy_ananta.sh --run-in-ci --no-color whoami \
+              | tee /tmp/smoke-test.log
+          if ! grep -qE '\[testServer\]\s+runner' /tmp/smoke-test.log; then
+              echo "ERROR: Smoke test #1 failed"
+              exit 1
+          fi
+
+          #2: no hosts.csv; no ananta arguments
+          bash -x installer/dummy_ananta.sh --run-in-ci whoami \
+              | tee /tmp/smoke-test.log
+          if ! grep -qF 'runner' /tmp/smoke-test.log; then
+              echo "ERROR: Smoke test #2 failed"
+              exit 1
+          fi
 
           docker save -o "ananta.latest.tar" "${{ env.ananta_repo }}:latest"
 
       -
         name: Build and push
         uses: docker/build-push-action@v6
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         with:
           context: ${{ matrix.variant == 'installer' && './installer/' || '.' }}
           push: true

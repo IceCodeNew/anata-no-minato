@@ -27,8 +27,8 @@ get_latest_ananta_image() {
 }
 
 # parse arguments
-inputs=()
-append=()
+ananta_args=()
+ssh_command=()
 docker_run_args=('--interactive' '--tty')
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -50,22 +50,20 @@ In case you want to specify an existing hosts.csv,
         shift
         ;;
     -[nNsSeEcCvV]|--no-color|--separate-output|--allow-empty-line|--allow-cursor-control|--version)
-        inputs+=("$1")
+        ananta_args+=("$1")
         shift
         ;;
     -[tTwWkK]|--host-tags|--terminal-width|--default-key)
-        inputs+=("$1" "$2")
+        ananta_args+=("$1" "$2")
         shift 2
         ;;
     [!-]*.[cC][sS][vV])
         might_be_hosts_csv="$1"
         shift
-        # Capture all remaining args (commands) in `append` and exit the parse loop
-        append=("$@")
-        break
         ;;
     *)
-        append=("$@")
+        # Capture all remaining args (commands) in `ssh_command` and exit the parse loop
+        ssh_command=("$@")
         break
         ;;
     esac
@@ -82,7 +80,7 @@ if [[ -n "$might_be_hosts_csv" ]]; then
     if [[ -f "$absolute_hosts_csv" ]]; then
         docker_run_args+=('--volume' "${absolute_hosts_csv}:/home/nonroot/$(basename "$absolute_hosts_csv"):ro")
     else
-        append=("$might_be_hosts_csv" "${append[@]}")
+        ssh_command=("$might_be_hosts_csv" "${ssh_command[@]}")
     fi
 fi
 
@@ -97,6 +95,5 @@ docker run --rm \
     --volume "${HOME}/.ssh/:/home/nonroot/.ssh/:ro" \
     --cpu-shares 512 --memory 512M --memory-swap 512M \
     --security-opt no-new-privileges \
-    icecodexi/ananta:latest "$absolute_hosts_csv" \
-        "${inputs[@]}" "${append[@]}" \
-    || exit 1
+    icecodexi/ananta:latest \
+        "${ananta_args[@]}" "$absolute_hosts_csv" "${ssh_command[@]}"
