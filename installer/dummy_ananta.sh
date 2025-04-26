@@ -98,5 +98,4 @@ docker run --rm \
     --cpu-shares 512 --memory 512M --memory-swap 512M \
     --security-opt no-new-privileges \
     icecodexi/ananta:latest "$absolute_hosts_csv" \
-        "${inputs[@]}" "${append[@]}" \
-    || exit 1
+        "${inputs[@]}" "${append[@]}"
