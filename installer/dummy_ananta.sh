@@ -59,6 +59,10 @@ In case you want to specify an existing hosts.csv,
         append=("$@")
         break
         ;;
+    *)
+        append=("$@")
+        break
+        ;;
     esac
 done
 
