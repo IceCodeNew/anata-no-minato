@@ -69,11 +69,12 @@ jobs:
           Host localhost
               Hostname 127.0.0.1
               User $(whoami)
+              IdentityFile ${HOME}/.ssh/ed25519
           EEOOFF
 
           today=$(date +%Y-%m-%d)
           docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
-          bash -x installer/dummy_ananta.sh --run-in-ci whoami
+          bash -x installer/dummy_ananta.sh --run-in-ci whoami || exit 1
 
           docker save -o "ananta.latest.tar" "${{ env.ananta_repo }}:latest"
 
