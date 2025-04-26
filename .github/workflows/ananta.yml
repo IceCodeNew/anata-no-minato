@@ -80,10 +80,20 @@ jobs:
 
           today=$(date +%Y-%m-%d)
           docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
+
+          #1: no hosts.csv; ananta arguments specified
           bash -x installer/dummy_ananta.sh --run-in-ci --no-color whoami \
               | tee /tmp/smoke-test.log
           if ! grep -qE '\[testServer\]\s+runner' /tmp/smoke-test.log; then
-              echo "ERROR: Smoke test failed"
+              echo "ERROR: Smoke test #1 failed"
+              exit 1
+          fi
+
+          #2: no hosts.csv; no ananta arguments
+          bash -x installer/dummy_ananta.sh --run-in-ci whoami \
+              | tee /tmp/smoke-test.log
+          if ! grep -qF 'runner' /tmp/smoke-test.log; then
+              echo "ERROR: Smoke test #2 failed"
               exit 1
           fi
 
