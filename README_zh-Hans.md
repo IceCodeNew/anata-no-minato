@@ -30,6 +30,9 @@ docker run --rm --interactive --tty \
     icecodexi/ananta:installer \
         cp -f /usr/local/bin/ananta /tmp/ananta
 
+# 建议在执行任何脚本之前，都先检查脚本的内容
+cat ./ananta
+
 sudo install -pvD ./ananta /usr/local/bin/
 rm ./ananta
 ```

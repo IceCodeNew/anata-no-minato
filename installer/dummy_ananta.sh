@@ -3,6 +3,7 @@ set -e -o pipefail
 
 get_latest_ananta_image() {
     local tags today prune_list pull
+    pull='true'
     set +e
     IFS=$'\n' read -d "" -ra tags <<< "$(docker images --filter=reference='icecodexi/ananta' --format '{{.Tag}}')"
     set -e
