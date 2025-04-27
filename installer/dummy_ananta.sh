@@ -58,7 +58,7 @@ In case you want to specify an existing hosts.csv,
         shift 2
         ;;
     [!-]*.[cC][sS][vV])
-        might_be_hosts_csv="$1"
+        hosts_csv="$1"
         shift
         ;;
     *)
@@ -75,12 +75,12 @@ done
 if [[ "$UID" -ne 65532 ]]; then
     docker_run_args+=('--user' 'root')
 fi
-if [[ -n "$might_be_hosts_csv" ]]; then
-    absolute_hosts_csv="$(realpath "$might_be_hosts_csv")"
-    if [[ -f "$absolute_hosts_csv" ]]; then
-        docker_run_args+=('--volume' "${absolute_hosts_csv}:/home/nonroot/$(basename "$absolute_hosts_csv"):ro")
+if [[ -n "$hosts_csv" ]]; then
+    if [[ -f "$hosts_csv" ]]; then
+        docker_run_args+=('--volume' "${hosts_csv}:/home/nonroot/$(basename "$hosts_csv"):ro")
     else
-        ssh_command=("$might_be_hosts_csv" "${ssh_command[@]}")
+        echo "ERROR: ${hosts_csv} does not exist or is not a regular file."
+        exit 1
     fi
 fi
 
@@ -96,4 +96,4 @@ docker run --rm \
     --cpu-shares 512 --memory 512M --memory-swap 512M \
     --security-opt no-new-privileges \
     icecodexi/ananta:latest \
-        "${ananta_args[@]}" "$absolute_hosts_csv" "${ssh_command[@]}"
+        "${ananta_args[@]}" "$hosts_csv" "${ssh_command[@]}"
