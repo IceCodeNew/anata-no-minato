@@ -4,7 +4,7 @@ set -e -o pipefail
 cd /home/nonroot/.ssh/ || exit 1
 ananta_args=()
 ssh_command=()
-hosts_file="/home/nonroot/_autogen_hosts.csv"
+hosts_csv="/home/nonroot/_autogen_hosts.csv"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -37,14 +37,14 @@ done
 
 if [[ -n "$_HOSTS_CSV" ]]; then
     # Modify the hosts.csv path to be under /home/nonroot/
-    hosts_file="/home/nonroot/$(basename "$_HOSTS_CSV")"
+    hosts_csv="/home/nonroot/$(basename "$_HOSTS_CSV")"
 else
     echo "INFO: Will try to generate one using the SSH config..."
     /home/nonroot/sshconfig_to_ananta/main.py \
         --ssh /home/nonroot/.ssh/config \
         --relocate /home/nonroot/.ssh/ \
-        "$hosts_file"
+        "$hosts_csv"
 fi
 
 # Run the ananta command with the modified arguments
-exec catatonit -- ananta "${ananta_args[@]}" "$hosts_file" "${ssh_command[@]}"
+exec catatonit -- ananta "${ananta_args[@]}" "$hosts_csv" "${ssh_command[@]}"
