@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: ${{ github.event_name == 'pull_request' && fromJson('["latest"]') || fromJson('["latest","installer"]') }}
+        variant: ${{ github.event_name == 'pull_request' && fromJson('["dev"]') || fromJson('["latest","installer"]') }}
     steps:
       -
         name: Set up QEMU
@@ -51,17 +51,28 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/checkout@v4
+      - name: Set up env
+        run: |
+          VER_ANATA_NO_MINATO=$(tr -d '\r\n\t\f\v ' < .version)
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              VER_ANATA_NO_MINATO="dev"
+          fi
+          echo "VER_ANATA_NO_MINATO=${VER_ANATA_NO_MINATO}" >> "$GITHUB_ENV"
+          sed -i \
+              -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${VER_ANATA_NO_MINATO}/" \
+              installer/dummy_ananta.sh
 
       - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@v6
-        if: ${{ matrix.variant == 'latest' }}
+        if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         with:
-          load: true
-          tags: ${{ env.ananta_repo }}:latest
+          build-args: VER_ANATA_NO_MINATO=${{ env.VER_ANATA_NO_MINATO }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          load: true
+          tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
       - name: Smoke Test
-        if: ${{ matrix.variant == 'latest' }}
+        if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         run: |
           sudo apt-get update -qq \
               && sudo apt-get -y install \
@@ -77,9 +88,6 @@ jobs:
               User $(whoami)
               IdentityFile ${HOME}/.ssh/ed25519
           EEOOFF
-
-          today=$(date +%Y-%m-%d)
-          docker tag "${{ env.ananta_repo }}:latest" "${{ env.ananta_repo }}:${today}"
 
           #1: no hosts.csv; ananta arguments specified
           bash -x installer/dummy_ananta.sh --run-in-ci --no-color whoami \
@@ -97,23 +105,28 @@ jobs:
               exit 1
           fi
 
-          docker save -o "ananta.latest.tar" "${{ env.ananta_repo }}:latest"
+          docker save -o "ananta.${{ matrix.variant }}.tar" "${{ env.ananta_repo }}:${{ matrix.variant }}"
 
       -
         name: Build and push
         uses: docker/build-push-action@v6
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         with:
-          context: ${{ matrix.variant == 'installer' && './installer/' || '.' }}
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
+          build-args: VER_ANATA_NO_MINATO=${{ env.VER_ANATA_NO_MINATO }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          context: ${{ matrix.variant == 'installer' && './installer/' || '.' }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{
+                matrix.variant == 'installer' && fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}"]')
+                || fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}","${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}"]')
+            }}
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
-        if: ${{ matrix.variant == 'latest' }}
+        if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         with:
           input: "ananta.${{ matrix.variant }}.tar"
           format: 'table'

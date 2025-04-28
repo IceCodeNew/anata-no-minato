@@ -6,6 +6,9 @@ RUN uv tool install 'ananta[speed]'
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets
 FROM gcr.io/distroless/python3:latest
+ARG VER_ANATA_NO_MINATO
+LABEL org.icecodexi.ananta.version="${VER_ANATA_NO_MINATO}"
+
 COPY --link --chmod=0755 ./docker-entrypoint.sh /usr/local/bin/
 # toybox + bash(ash) + catatonit
 COPY --link --from=assets /usr/bin/             /usr/bin/

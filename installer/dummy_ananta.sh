@@ -1,31 +1,6 @@
 #!/usr/bin/env bash
 set -e -o pipefail
 
-get_latest_ananta_image() {
-    local tags today prune_list pull
-    pull='true'
-    set +e
-    IFS=$'\n' read -d "" -ra tags <<< "$(docker images --filter=reference='icecodexi/ananta' --format '{{.Tag}}')"
-    set -e
-
-    today=$(date +%Y-%m-%d)
-    for tag in "${tags[@]}"; do
-        case "$tag" in
-            "$today") pull='false';;
-            'latest') ;;
-                   *) prune_list+=("icecodexi/ananta:$tag");;
-        esac
-    done
-
-    if [[ "$pull" != 'false' ]]; then
-        docker pull icecodexi/ananta:latest
-        docker tag icecodexi/ananta:latest "icecodexi/ananta:${today}"
-    fi
-    if [[ "${#prune_list[@]}" -gt '0' ]]; then
-        docker rmi --force "${prune_list[@]}"
-    fi
-}
-
 # parse arguments
 ananta_args=()
 ssh_command=()
@@ -44,6 +19,10 @@ In case you want to specify an existing hosts.csv,
 `ananta -t arch hosts.csv sudo pacman -Syu --noconfirm`
 '
         exit 0
+        ;;
+    --helper-version)
+        echo "anata-no-minato: REPLACE_ME_ANATA_NO_MINATO_VERSION"
+        shift
         ;;
     --run-in-ci)
         docker_run_args=('--network' 'host')
@@ -69,6 +48,20 @@ In case you want to specify an existing hosts.csv,
     esac
 done
 
+clean_out_date_ananta_images() {
+    local tags prune_list=()
+    set +e
+    IFS=$'\n' read -d "" -ra tags <<< "$(docker images --filter=reference='icecodexi/ananta' --format '{{.Tag}}')"
+    set -e
+
+    for tag in "${tags[@]}"; do
+        [[ "$tag" != 'REPLACE_ME_ANATA_NO_MINATO_VERSION' ]] && prune_list+=("icecodexi/ananta:$tag")
+    done
+    if [[ "${#prune_list[@]}" -gt '0' ]]; then
+        docker rmi --force "${prune_list[@]}"
+    fi
+}
+
 # main function
 
 # Allow the nonroot user in the container to read files under ${HOME}/.ssh/ of other users
@@ -87,7 +80,7 @@ fi
 # preflight checklist
 mkdir -p "${HOME}/.ssh/"
 find "${HOME}/.ssh/" -type f -print0 | xargs -0 -r chmod 600
-get_latest_ananta_image
+clean_out_date_ananta_images
 
 docker run --rm \
     "${docker_run_args[@]}" \
@@ -95,5 +88,5 @@ docker run --rm \
     --volume "${HOME}/.ssh/:/home/nonroot/.ssh/:ro" \
     --cpu-shares 512 --memory 512M --memory-swap 512M \
     --security-opt no-new-privileges \
-    icecodexi/ananta:latest \
+    icecodexi/ananta:REPLACE_ME_ANATA_NO_MINATO_VERSION \
         "${ananta_args[@]}" "$hosts_csv" "${ssh_command[@]}"
