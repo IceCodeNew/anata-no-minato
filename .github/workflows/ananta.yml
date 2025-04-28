@@ -107,7 +107,7 @@ jobs:
               exit 1
           fi
 
-          docker save -o "ananta.${{ matrix.variant }}.tar" "${{ env.ananta_repo }}:${{ matrix.variant }}"
+          docker save -o "ananta.${{ env.VER_ANATA_NO_MINATO }}.tar" "${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}"
 
       -
         name: Build and push
@@ -128,5 +128,5 @@ jobs:
         uses: aquasecurity/trivy-action@0.30.0
         if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         with:
-          input: "ananta.${{ matrix.variant }}.tar"
+          input: "ananta.${{ env.VER_ANATA_NO_MINATO }}.tar"
           format: 'table'
