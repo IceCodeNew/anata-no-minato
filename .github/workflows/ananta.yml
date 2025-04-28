@@ -70,7 +70,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
-          tags: ${{ env.ananta_repo }}:${{ matrix.variant }}
+          tags: |
+            ${{ env.ananta_repo }}:${{ matrix.variant }}
+            ${{ matrix.variant != 'installer' && format('{0}:{1}', env.ananta_repo, env.VER_ANATA_NO_MINATO) }}
       - name: Smoke Test
         if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         run: |
@@ -119,10 +121,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{
-                matrix.variant == 'installer' && fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}"]')
-                || fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}","${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}"]')
-            }}
+            ${{ env.ananta_repo }}:${{ matrix.variant }}
+            ${{ matrix.variant != 'installer' && format('{0}:{1}', env.ananta_repo, env.VER_ANATA_NO_MINATO) }}
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
