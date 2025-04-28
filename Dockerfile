@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+ARG VER_ANATA_NO_MINATO
 
 FROM mirror.gcr.io/icecodexi/python:debian-nonroot AS build
 RUN uv tool install 'ananta[speed]'
@@ -6,6 +7,8 @@ RUN uv tool install 'ananta[speed]'
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets
 FROM gcr.io/distroless/python3:latest
+LABEL VER_ANATA_NO_MINATO="${VER_ANATA_NO_MINATO}"
+
 COPY --link --chmod=0755 ./docker-entrypoint.sh /usr/local/bin/
 # toybox + bash(ash) + catatonit
 COPY --link --from=assets /usr/bin/             /usr/bin/
