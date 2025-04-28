@@ -49,7 +49,7 @@ In case you want to specify an existing hosts.csv,
 done
 
 clean_out_date_ananta_images() {
-    local tags prune_list
+    local tags prune_list=()
     set +e
     IFS=$'\n' read -d "" -ra tags <<< "$(docker images --filter=reference='icecodexi/ananta' --format '{{.Tag}}')"
     set -e

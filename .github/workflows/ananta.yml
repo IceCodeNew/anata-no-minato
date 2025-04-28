@@ -57,7 +57,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               VER_ANATA_NO_MINATO="dev"
           fi
-          echo "VER_ANATA_NO_MINATO=${VER_ANATA_NO_MINATO}" >> $GITHUB_ENV
+          echo "VER_ANATA_NO_MINATO=${VER_ANATA_NO_MINATO}" >> "$GITHUB_ENV"
           sed -i \
               -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${VER_ANATA_NO_MINATO}/" \
               installer/dummy_ananta.sh
@@ -121,7 +121,7 @@ jobs:
           tags: |
             ${{
                 matrix.variant == 'installer' && fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}"]')
-                || fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}","${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}"]') 
+                || fromJson('["${{ env.ananta_repo }}:${{ matrix.variant }}","${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}"]')
             }}
       -
         name: Run Trivy vulnerability scanner
