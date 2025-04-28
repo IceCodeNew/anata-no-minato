@@ -48,6 +48,31 @@ In case you want to specify an existing hosts.csv,
     esac
 done
 
+# Removes all local Docker images for 'icecodexi/ananta' except the one with the placeholder version tag.
+#
+# This function scans for all Docker images tagged as 'icecodexi/ananta', excluding the image tagged with 'REPLACE_ME_ANATA_NO_MINATO_VERSION', and forcibly deletes the rest.
+#
+# Globals:
+#
+# * None
+#
+# Arguments:
+#
+# * None
+#
+# Outputs:
+#
+# * None (unless Docker emits output during image removal)
+#
+# Returns:
+#
+# * None
+#
+# Example:
+#
+# ```bash
+# clean_out_date_ananta_images
+# ```
 clean_out_date_ananta_images() {
     local tags prune_list
     set +e
