@@ -52,7 +52,7 @@ jobs:
         run: |
           ver_anata_helper=$(tr -d '\r\n\t\f\v ' < .version)
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              ${{ env.variant }}='dev'
+              echo "variant=dev" >> "$GITHUB_ENV"
               ver_anata_helper='dev'
           fi
           echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_ENV"
