@@ -15,7 +15,7 @@
 以下の手順に従って、ananta のヘルパースクリプトをインストールしてください。  
 
 ```shell
-curl -LROJ -- \
+curl -sSLROJ --fail -- \
     "https://github.com/IceCodeNew/anata-no-minato/releases/latest/download/ananta"
 
 # スクリプトを実行する前に、内容を確認することを推奨します。

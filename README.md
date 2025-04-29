@@ -15,7 +15,7 @@ Since it is routine for me to spend lot of my labour hours in an air-gapped envi
 Use this tiny installer image to install a helper script of `ananta`:
 
 ```shell
-curl -LROJ -- \
+curl -sSLROJ --fail -- \
     "https://github.com/IceCodeNew/anata-no-minato/releases/latest/download/ananta"
 
 # it is always a good idea to check the content of a script before executing it

@@ -15,7 +15,7 @@
 以下命令会拉取一个极小的安装镜像，用于在当前系统上安装 `ananta` 的帮助脚本：
 
 ```shell
-curl -LROJ -- \
+curl -sSLROJ --fail -- \
     "https://github.com/IceCodeNew/anata-no-minato/releases/latest/download/ananta"
 
 # 建议在执行任何脚本之前，都先检查脚本的内容

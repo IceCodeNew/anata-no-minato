@@ -29,14 +29,11 @@ on:
 
 env:
   ananta_repo: ${{ secrets.DOCKERHUB_USERNAME }}/ananta
+  variant: latest
 
 jobs:
   ananta:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        variant: ${{ github.event_name == 'pull_request' && fromJson('["dev"]') || fromJson('["latest"]') }}
     steps:
       -
         name: Set up QEMU
@@ -53,14 +50,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set up env
         run: |
-          VER_ANATA_NO_MINATO=$(tr -d '\r\n\t\f\v ' < .version)
+          ver_anata_helper=$(tr -d '\r\n\t\f\v ' < .version)
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              VER_ANATA_NO_MINATO="dev"
+              ${{ env.variant }}='dev'
+              ver_anata_helper='dev'
           fi
-          echo "VER_ANATA_NO_MINATO=${VER_ANATA_NO_MINATO}" >> "$GITHUB_ENV"
+          echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_ENV"
 
           mkdir -p assets
-          sed -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${VER_ANATA_NO_MINATO}/" \
+          sed -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${ver_anata_helper}/" \
               script/dummy_ananta.sh \
               > assets/ananta
           chmod +x assets/ananta
@@ -68,13 +66,13 @@ jobs:
       - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@v6
         with:
-          build-args: VER_ANATA_NO_MINATO=${{ env.VER_ANATA_NO_MINATO }}
+          build-args: ver_anata_helper=${{ env.ver_anata_helper }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
           tags: |
-            ${{ env.ananta_repo }}:${{ matrix.variant }}
-            ${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}
+            ${{ env.ananta_repo }}:${{ env.variant }}
+            ${{ env.ananta_repo }}:${{ env.ver_anata_helper }}
       - name: Smoke Test
         run: |
           sudo apt-get update -qq \
@@ -108,22 +106,22 @@ jobs:
               exit 1
           fi
 
-          docker save -o "ananta.${{ env.VER_ANATA_NO_MINATO }}.tar" "${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}"
+          docker save -o "ananta.${{ env.ver_anata_helper }}.tar" "${{ env.ananta_repo }}:${{ env.ver_anata_helper }}"
 
       -
         name: Build and push
         uses: docker/build-push-action@v6
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         with:
-          build-args: VER_ANATA_NO_MINATO=${{ env.VER_ANATA_NO_MINATO }}
+          build-args: ver_anata_helper=${{ env.ver_anata_helper }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: '.'
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.ananta_repo }}:${{ matrix.variant }}
-            ${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}
+            ${{ env.ananta_repo }}:${{ env.variant }}
+            ${{ env.ananta_repo }}:${{ env.ver_anata_helper }}
       -
         name: Release
         uses: softprops/action-gh-release@v2
@@ -132,11 +130,11 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           make_latest: true
-          tag_name: ${{ env.VER_ANATA_NO_MINATO }}
+          tag_name: ${{ env.ver_anata_helper }}
           files: assets/ananta
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          input: "ananta.${{ env.VER_ANATA_NO_MINATO }}.tar"
+          input: "ananta.${{ env.ver_anata_helper }}.tar"
           format: 'table'
