@@ -1,6 +1,6 @@
 name: ananta Image CI
 permissions:
-  contents: read
+  contents: write
   packages: write
   id-token: write
 
@@ -10,7 +10,7 @@ on:
     - 'master'
     paths:
     - '.github/workflows/ananta.yml'
-    - 'installer/**'
+    - 'script/dummy_ananta.sh'
     - 'sshconfig_to_ananta/**'
     - '!sshconfig_to_ananta/test_**'
     - 'docker-entrypoint.sh'
@@ -18,7 +18,7 @@ on:
   pull_request:
     paths:
     - '.github/workflows/ananta.yml'
-    - 'installer/dummy_ananta.sh'
+    - 'script/dummy_ananta.sh'
     - 'sshconfig_to_ananta/**'
     - '!sshconfig_to_ananta/test_**'
     - 'docker-entrypoint.sh'
@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: ${{ github.event_name == 'pull_request' && fromJson('["dev"]') || fromJson('["latest","installer"]') }}
+        variant: ${{ github.event_name == 'pull_request' && fromJson('["dev"]') || fromJson('["latest"]') }}
     steps:
       -
         name: Set up QEMU
@@ -58,13 +58,15 @@ jobs:
               VER_ANATA_NO_MINATO="dev"
           fi
           echo "VER_ANATA_NO_MINATO=${VER_ANATA_NO_MINATO}" >> "$GITHUB_ENV"
-          sed -i \
-              -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${VER_ANATA_NO_MINATO}/" \
-              installer/dummy_ananta.sh
+
+          mkdir -p assets
+          sed -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${VER_ANATA_NO_MINATO}/" \
+              script/dummy_ananta.sh \
+              > assets/ananta
+          chmod +x assets/ananta
 
       - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@v6
-        if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         with:
           build-args: VER_ANATA_NO_MINATO=${{ env.VER_ANATA_NO_MINATO }}
           cache-from: type=gha
@@ -72,9 +74,8 @@ jobs:
           load: true
           tags: |
             ${{ env.ananta_repo }}:${{ matrix.variant }}
-            ${{ matrix.variant != 'installer' && format('{0}:{1}', env.ananta_repo, env.VER_ANATA_NO_MINATO) || '' }}
+            ${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}
       - name: Smoke Test
-        if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         run: |
           sudo apt-get update -qq \
               && sudo apt-get -y install \
@@ -92,7 +93,7 @@ jobs:
           EEOOFF
 
           #1: no hosts.csv; ananta arguments specified
-          bash -x installer/dummy_ananta.sh --run-in-ci --no-color whoami \
+          bash -x assets/ananta --run-in-ci --no-color whoami \
               | tee /tmp/smoke-test.log
           if ! grep -qE '\[testServer\]\s+runner' /tmp/smoke-test.log; then
               echo "ERROR: Smoke test #1 failed"
@@ -100,7 +101,7 @@ jobs:
           fi
 
           #2: no hosts.csv; no ananta arguments
-          bash -x installer/dummy_ananta.sh --run-in-ci whoami \
+          bash -x assets/ananta --run-in-ci whoami \
               | tee /tmp/smoke-test.log
           if ! grep -qF 'runner' /tmp/smoke-test.log; then
               echo "ERROR: Smoke test #2 failed"
@@ -117,16 +118,25 @@ jobs:
           build-args: VER_ANATA_NO_MINATO=${{ env.VER_ANATA_NO_MINATO }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: ${{ matrix.variant == 'installer' && './installer/' || '.' }}
+          context: '.'
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ env.ananta_repo }}:${{ matrix.variant }}
-            ${{ matrix.variant != 'installer' && format('{0}:{1}', env.ananta_repo, env.VER_ANATA_NO_MINATO) || '' }}
+            ${{ env.ananta_repo }}:${{ env.VER_ANATA_NO_MINATO }}
+      -
+        name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        with:
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          make_latest: true
+          tag_name: ${{ env.VER_ANATA_NO_MINATO }}
+          files: assets/ananta
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
-        if: ${{ matrix.variant == 'latest' || matrix.variant == 'dev' }}
         with:
           input: "ananta.${{ env.VER_ANATA_NO_MINATO }}.tar"
           format: 'table'

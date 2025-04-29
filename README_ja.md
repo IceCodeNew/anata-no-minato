@@ -1,6 +1,6 @@
 # Anata No Minato（あなたのみなと）
 
-[English](README.md) | [中文](README_zh-Hans.md) | [日本語](README_ja.md)  
+[English](README.md) | [简体中文](README_zh-Hans.md) | [日本語](README_ja.md)  
   
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/IceCodeNew/anata-no-minato?utm_source=oss&utm_medium=github&utm_campaign=IceCodeNew%2Fanata-no-minato&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 [![CodeQL](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/github-code-scanning/codeql)
@@ -15,12 +15,8 @@
 以下の手順に従って、ananta のヘルパースクリプトをインストールしてください。  
 
 ```shell
-docker pull icecodexi/ananta:installer
-docker run --rm --interactive --tty \
-    --volume "$(pwd):/tmp/" \
-    --security-opt no-new-privileges \
-    icecodexi/ananta:installer \
-        cp -f /usr/local/bin/ananta /tmp/ananta
+curl -LROJ -- \
+    "https://github.com/IceCodeNew/anata-no-minato/releases/latest/download/ananta"
 
 # スクリプトを実行する前に、内容を確認することを推奨します。
 cat ./ananta
