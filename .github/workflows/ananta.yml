@@ -48,7 +48,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/checkout@v4
-      - name: Set up env
+      - name: Chores (envs & tags)
+        id: chores
         run: |
           ver_anata_helper=$(tr -d '\r\n\t\f\v ' < .version)
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -62,6 +63,12 @@ jobs:
               script/dummy_ananta.sh \
               > assets/ananta
           chmod +x assets/ananta
+
+          if git ls-remote --tags origin | grep -qF "refs/tags/${ver_anata_helper}$"; then
+              echo "skip_release=true"  >> "$GITHUB_OUTPUT"
+          else
+              echo "skip_release=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@v6
@@ -122,10 +129,11 @@ jobs:
           tags: |
             ${{ env.ananta_repo }}:${{ env.variant }}
             ${{ env.ananta_repo }}:${{ env.ver_anata_helper }}
+
       -
         name: Release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.chores.outputs.skip_release == 'false'
         with:
           fail_on_unmatched_files: true
           generate_release_notes: true
