@@ -56,7 +56,7 @@ jobs:
               echo "variant=dev" >> "$GITHUB_ENV"
               ver_anata_helper='dev'
           fi
-          echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_ENV"
+          echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_OUTPUT"
 
           mkdir -p assets
           sed -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${ver_anata_helper}/" \
@@ -73,13 +73,13 @@ jobs:
       - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@v6
         with:
-          build-args: ver_anata_helper=${{ env.ver_anata_helper }}
+          build-args: ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
           tags: |
             ${{ env.ananta_repo }}:${{ env.variant }}
-            ${{ env.ananta_repo }}:${{ env.ver_anata_helper }}
+            ${{ env.ananta_repo }}:${{ steps.chores.outputs.ver_anata_helper }}
       - name: Smoke Test
         run: |
           sudo apt-get update -qq \
@@ -113,14 +113,14 @@ jobs:
               exit 1
           fi
 
-          docker save -o "ananta.${{ env.ver_anata_helper }}.tar" "${{ env.ananta_repo }}:${{ env.ver_anata_helper }}"
+          docker save -o "ananta.${{ steps.chores.outputs.ver_anata_helper }}.tar" "${{ env.ananta_repo }}:${{ steps.chores.outputs.ver_anata_helper }}"
 
       -
         name: Build and push
         uses: docker/build-push-action@v6
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
-          build-args: ver_anata_helper=${{ env.ver_anata_helper }}
+          build-args: ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: '.'
@@ -128,7 +128,7 @@ jobs:
           push: true
           tags: |
             ${{ env.ananta_repo }}:${{ env.variant }}
-            ${{ env.ananta_repo }}:${{ env.ver_anata_helper }}
+            ${{ env.ananta_repo }}:${{ steps.chores.outputs.ver_anata_helper }}
 
       -
         name: Release
@@ -138,11 +138,11 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           make_latest: true
-          tag_name: ${{ env.ver_anata_helper }}
+          tag_name: ${{ steps.chores.outputs.ver_anata_helper }}
           files: assets/ananta
       -
         name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          input: "ananta.${{ env.ver_anata_helper }}.tar"
+          input: "ananta.${{ steps.chores.outputs.ver_anata_helper }}.tar"
           format: 'table'
