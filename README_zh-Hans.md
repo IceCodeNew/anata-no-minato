@@ -1,6 +1,6 @@
 # Anata No Minato（あなたのみなと）
 
-[English](README.md) | [中文](README_zh-Hans.md) | [日本語](README_ja.md)  
+[English](README.md) | [简体中文](README_zh-Hans.md) | [日本語](README_ja.md)  
   
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/IceCodeNew/anata-no-minato?utm_source=oss&utm_medium=github&utm_campaign=IceCodeNew%2Fanata-no-minato&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 [![CodeQL](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/github-code-scanning/codeql)
@@ -15,12 +15,8 @@
 以下命令会拉取一个极小的安装镜像，用于在当前系统上安装 `ananta` 的帮助脚本：
 
 ```shell
-docker pull icecodexi/ananta:installer
-docker run --rm --interactive --tty \
-    --volume "$(pwd):/tmp/" \
-    --security-opt no-new-privileges \
-    icecodexi/ananta:installer \
-        cp -f /usr/local/bin/ananta /tmp/ananta
+curl -sSLROJ --fail -- \
+    "https://github.com/IceCodeNew/anata-no-minato/releases/latest/download/ananta"
 
 # 建议在执行任何脚本之前，都先检查脚本的内容
 cat ./ananta
