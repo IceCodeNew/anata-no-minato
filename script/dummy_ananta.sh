@@ -22,7 +22,7 @@ In case you want to specify an existing hosts.csv,
         ;;
     --helper-version)
         echo "anata-no-minato: REPLACE_ME_ANATA_NO_MINATO_VERSION"
-        shift
+        exit 0
         ;;
     --run-in-ci)
         docker_run_args=('--network' 'host')
