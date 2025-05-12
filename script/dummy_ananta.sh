@@ -49,14 +49,23 @@ In case you want to specify an existing hosts.csv,
 done
 
 clean_out_date_ananta_images() {
+    local latest_image_exist='false'
     local tags prune_list=()
     set +e
     IFS=$'\n' read -d "" -ra tags <<< "$(docker images --filter=reference='icecodexi/ananta' --format '{{.Tag}}')"
     set -e
 
     for tag in "${tags[@]}"; do
-        [[ "$tag" != 'REPLACE_ME_ANATA_NO_MINATO_VERSION' ]] && prune_list+=("icecodexi/ananta:$tag")
+        if [[ "$tag" = 'REPLACE_ME_ANATA_NO_MINATO_VERSION' ]]; then
+            latest_image_exist='true'
+        else
+            prune_list+=("icecodexi/ananta:$tag")
+        fi
     done
+
+    if [[ "$latest_image_exist" = 'false' ]]; then
+        docker pull icecodexi/ananta:REPLACE_ME_ANATA_NO_MINATO_VERSION
+    fi
     if [[ "${#prune_list[@]}" -gt '0' ]]; then
         docker rmi --force "${prune_list[@]}"
     fi
