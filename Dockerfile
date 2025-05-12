@@ -1,6 +1,13 @@
 # syntax=docker/dockerfile:1
 
+FROM ghcr.io/astral-sh/uv:latest AS distroless-uv
 FROM mirror.gcr.io/icecodexi/python:debian-nonroot AS build
+COPY --link --from=distroless-uv /uv /uvx \
+    /usr/local/bin/
+ENV PATH="/home/nonroot/.local/bin:${PATH}" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_NO_CACHE=1
+
 RUN uv tool install 'ananta[speed]'
 
 
