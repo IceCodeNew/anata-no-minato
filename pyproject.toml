@@ -10,6 +10,9 @@ dependencies = []
 requires-python = ">=3.10"
 readme = "README.md"
 
+[project.urls]
+repository = "https://github.com/IceCodeNew/anata-no-minato"
+
 [project.scripts]
 sshconfig_to_ananta = "sshconfig_to_ananta:main"
 
