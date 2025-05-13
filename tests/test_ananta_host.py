@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ananta_host import AnantaHost
+from sshconfig_to_ananta.ananta_host import AnantaHost
 
 
 class TestAnantaHost(unittest.TestCase):
