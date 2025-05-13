@@ -8,7 +8,8 @@ ENV PATH="/home/nonroot/.local/bin:${PATH}" \
     UV_COMPILE_BYTECODE=1 \
     UV_NO_CACHE=1
 
-RUN uv tool install 'ananta[speed]'
+ARG ver_ananta=1.1.8
+RUN uv tool install "ananta[speed]==${ver_ananta}"
 
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets
