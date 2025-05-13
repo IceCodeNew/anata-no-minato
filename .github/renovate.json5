@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "config:recommended",
+    // "docker:pinDigests",
+    "helpers:pinGitHubActionDigests",
+    ":configMigration",
+    // ":pinDevDependencies"
+  ]
+}
