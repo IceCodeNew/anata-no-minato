@@ -44,7 +44,7 @@ ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 
 ### タグの指定方法
 
-SSH config 内で `#tags` 行を追加することで、各ホストにタグを付けることができます。複数のタグはカンマ（`,`）またはコロン（`:`）で区切って記述できます。例：  
+SSH config 内で `#tags` 行を追加し、各ホストにタグを付与します。複数のタグはカンマ（`,`）またはコロン（`:`）で区切って記述できます。例：  
 
 ```sshconfig
 Host mynas
