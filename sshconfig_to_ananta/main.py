@@ -6,7 +6,7 @@ import logging
 import sys
 from pathlib import Path
 
-from ssh_config_converter import convert_to_ananta_hosts
+from .ssh_config_converter import convert_to_ananta_hosts
 
 logging.basicConfig(
     level=logging.INFO,
