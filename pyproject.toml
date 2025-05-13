@@ -14,7 +14,7 @@ readme = "README.md"
 repository = "https://github.com/IceCodeNew/anata-no-minato"
 
 [project.scripts]
-sshconfig_to_ananta = "sshconfig_to_ananta:main"
+sshconfig_to_ananta = "sshconfig_to_ananta.main:main"
 
 
 [build-system]
