@@ -12,7 +12,7 @@ Since it is routine for me to spend lot of my labour hours in an air-gapped envi
 
 ## How to start
 
-Use this tiny installer image to install a helper script of `ananta`:
+Install the `ananta` helper script:
 
 ```shell
 curl -sSLROJ --fail -- \
