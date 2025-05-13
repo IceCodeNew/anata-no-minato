@@ -8,13 +8,15 @@ ENV PATH="/home/nonroot/.local/bin:${PATH}" \
     UV_COMPILE_BYTECODE=1 \
     UV_NO_CACHE=1
 
-RUN uv tool install 'ananta[speed]'
+ARG ver_ananta
+RUN uv tool install "ananta[speed]==${ver_ananta}"
 
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets
 FROM gcr.io/distroless/python3:latest
-ARG VER_ANATA_NO_MINATO
-LABEL org.icecodexi.ananta.version="${VER_ANATA_NO_MINATO}"
+ARG ver_anata_helper
+LABEL org.opencontainers.image.version="${ver_anata_helper}" \
+      org.opencontainers.image.source="https://github.com/IceCodeNew/anata-no-minato"
 
 COPY --link --chmod=0755 ./docker-entrypoint.sh /usr/local/bin/
 # toybox + bash(ash) + catatonit

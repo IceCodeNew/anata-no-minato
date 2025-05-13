@@ -52,13 +52,41 @@ jobs:
           persist-credentials: false
       - name: Chores (generate envs & assets)
         id: chores
+        env:
+          CACHED_GITHUB_API: ${{ secrets.GH_API_BASEURL }}
         run: |
+          set -e -o pipefail
+          TMP_FILE=$(mktemp)
+          if curl --fail --silent --show-error --location --include --head \
+              --header "Accept: application/vnd.github.v3+json" --output "$TMP_FILE" -- \
+              "${CACHED_GITHUB_API}"; then
+
+              HTTP_STATUS_CODE=$(awk 'NR==1 {print $2}' "$TMP_FILE")
+              if [[ $HTTP_STATUS_CODE -ge 200 ]] && [[ $HTTP_STATUS_CODE -le 299 ]]; then
+                  echo "info: github cache is ready. will connect to the cached API instead of the default one"
+                  GITHUB_API_BASEURL="${CACHED_GITHUB_API}"
+              fi
+          fi
+          : "${GITHUB_API_BASEURL:="https://api.github.com"}"
+          "rm" -f "$TMP_FILE"
+
           ver_anata_helper=$(tr -d '\r\n\t\f\v ' < .version)
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "variant=dev" >> "$GITHUB_ENV"
               ver_anata_helper='dev'
           fi
+
+          ananta_latest_tag_name=$(
+              curl -sSL --fail --retry 5 --retry-delay 10 --retry-max-time 60 \
+                  -H 'Accept: application/vnd.github.v3+json' \
+                  "${GITHUB_API_BASEURL}/repos/cwt/ananta/releases/latest" \
+                  | jq -r .tag_name
+          )
+          ver_ananta="${ananta_latest_tag_name##v}"
+          ver_anata_helper="${ver_anata_helper}-${ver_ananta}"
+
           echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_OUTPUT"
+          echo       "ver_ananta=${ver_ananta}"       >> "$GITHUB_OUTPUT"
 
           mkdir -p assets
           sed -e "s/REPLACE_ME_ANATA_NO_MINATO_VERSION/${ver_anata_helper}/" \
@@ -69,7 +97,9 @@ jobs:
       - name: Build and load the latest variant to local daemon
         uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6
         with:
-          build-args: ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
+          build-args: |
+            ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
+            ver_ananta=${{ steps.chores.outputs.ver_ananta }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
@@ -119,7 +149,9 @@ jobs:
         uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
-          build-args: ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
+          build-args: |
+            ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
+            ver_ananta=${{ steps.chores.outputs.ver_ananta }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: '.'
