@@ -1,6 +1,6 @@
 # .dockerignore
-**/test_*.py
 **/__pycache__/
 .github/**
 assets/**
 script/**
+tests/**

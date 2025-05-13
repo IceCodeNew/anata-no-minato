@@ -11,10 +11,16 @@ on:
     paths:
     - '.github/workflows/unittest.yml'
     - 'sshconfig_to_ananta/**'
+    - 'tests/**'
+    - 'pdm.lock'
+    - 'pyproject.toml'
   pull_request:
     paths:
     - '.github/workflows/unittest.yml'
     - 'sshconfig_to_ananta/**'
+    - 'tests/**'
+    - 'pdm.lock'
+    - 'pyproject.toml'
 
 jobs:
   build:
