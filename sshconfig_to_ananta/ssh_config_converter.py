@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import Iterator, List, Optional, Tuple
 
-from ananta_host import AnantaHost
+from sshconfig_to_ananta.ananta_host import AnantaHost
 
 
 def _read_ssh_config(ssh_path: Path) -> Iterator[str]:

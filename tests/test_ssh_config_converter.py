@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ssh_config_converter import (
+from sshconfig_to_ananta.ssh_config_converter import (
     _host_disabled,
     _parse_valid_line,
     _process_proxy_warning,

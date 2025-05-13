@@ -12,9 +12,12 @@ on:
     - '.github/workflows/ananta.yml'
     - 'script/dummy_ananta.sh'
     - 'sshconfig_to_ananta/**'
-    - '!sshconfig_to_ananta/test_**'
+    - 'tests/**'
+    - '.dockerignore'
     - 'docker-entrypoint.sh'
     - 'Dockerfile'
+    - 'pdm.lock'
+    - 'pyproject.toml'
   pull_request:
     paths:
     - '.github/workflows/ananta.yml'
