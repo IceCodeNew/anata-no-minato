@@ -32,6 +32,10 @@ while [[ $# -gt 0 ]]; do
         ssh_command=("$@")
         break
         ;;
+    *)
+        echo "FATAL: $0 failed to parse the arguments. Not supposed to reach here."
+        exit 1
+        ;;
     esac
 done
 
@@ -40,7 +44,7 @@ if [[ -n "$_HOSTS_CSV" ]]; then
     hosts_csv="/home/nonroot/$(basename "$_HOSTS_CSV")"
 else
     echo "INFO: Will try to generate one using the SSH config..."
-    /home/nonroot/sshconfig_to_ananta/main.py \
+    sshconfig_to_ananta \
         --ssh /home/nonroot/.ssh/config \
         --relocate /home/nonroot/.ssh/ \
         "$hosts_csv"

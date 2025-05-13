@@ -1,15 +1,23 @@
 # syntax=docker/dockerfile:1
 
 FROM ghcr.io/astral-sh/uv:latest AS distroless-uv
-FROM mirror.gcr.io/icecodexi/python:debian-nonroot AS build
+FROM mirror.gcr.io/icecodexi/python:debian-nonroot AS uv
 COPY --link --from=distroless-uv /uv /uvx \
     /usr/local/bin/
 ENV PATH="/home/nonroot/.local/bin:${PATH}" \
     UV_COMPILE_BYTECODE=1 \
     UV_NO_CACHE=1
 
+FROM uv AS build
+# install ananta
 ARG ver_ananta
-RUN uv tool install "ananta[speed]==${ver_ananta}"
+RUN uv --no-progress tool install "ananta[speed]==${ver_ananta}"
+
+# install sshconfig_to_ananta
+COPY --link --chown=65532:65532 /src/ /home/nonroot/sshconfig_to_ananta/src/
+RUN --mount=type=bind,source=README.md,target=/home/nonroot/sshconfig_to_ananta/README.md \
+    --mount=type=bind,source=pyproject.toml,target=/home/nonroot/sshconfig_to_ananta/pyproject.toml \
+    uv --no-progress tool install /home/nonroot/sshconfig_to_ananta/
 
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets
@@ -22,8 +30,8 @@ COPY --link --chmod=0755 ./docker-entrypoint.sh /usr/local/bin/
 # toybox + bash(ash) + catatonit
 COPY --link --from=assets /usr/bin/             /usr/bin/
 
-COPY --link --chmod=0755 ./sshconfig_to_ananta/ /home/nonroot/sshconfig_to_ananta/
-COPY --link --from=build  /home/nonroot/.local/ /home/nonroot/.local/
+COPY --link --from=build --chown=65532:65532 \
+                          /home/nonroot/.local/ /home/nonroot/.local/
 
 SHELL ["/usr/bin/bash", "-o", "pipefail", "-c"]
 RUN rm -rf /bin/ && ln -sf /usr/bin /bin

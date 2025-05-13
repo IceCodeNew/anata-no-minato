@@ -73,7 +73,7 @@ jobs:
           : "${GITHUB_API_BASEURL:="https://api.github.com"}"
           "rm" -f "$TMP_FILE"
 
-          ver_anata_helper=$(tr -d '\r\n\t\f\v ' < .version)
+          ver_anata_helper=$(yq -r '.project.version' pyproject.toml | tr -d '\r\n\t\f\v ')
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "variant=dev" >> "$GITHUB_ENV"
               ver_anata_helper='dev'
