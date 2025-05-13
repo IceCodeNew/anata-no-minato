@@ -1,0 +1,24 @@
+[project]
+name = "sshconfig_to_ananta"
+version = "1.0.0"
+description = "Convert SSH config to Ananta hosts CSV format"
+authors = [
+    {name = "IceCodeNew"},
+    {name = "yzqzss" },
+]
+dependencies = []
+requires-python = ">=3.10"
+readme = "README.md"
+
+[project.scripts]
+sshconfig_to_ananta = "sshconfig_to_ananta:main"
+
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
