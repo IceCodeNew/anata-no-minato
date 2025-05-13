@@ -39,6 +39,37 @@ In case you want to specify an existing hosts.csv,
 ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```
 
+## Hacking SSH Config for Ananta
+
+### Specify Tags
+
+You can assign tags to hosts by including a `#tags` line in your SSH config. Separate multiple tags using either commas (`,`) or colons (`:`), as shown below:  
+
+```sshconfig
+Host mynas
+    Hostname 1.1.1.1
+    User root
+    #tags tailscale,debian:nas,home
+```
+
+### Excluding a Host from hosts.csv Generation
+
+To exclude a host from the generated `hosts.csv` file, add the `!ananta` tag to its tags list. Any host marked with this tag will be skipped during the generation process.  
+
+```sshconfig
+Host do_not_ananta_in_this_host
+    #tags home,debian,!ananta
+```
+
+### Disabling the tags option
+
+To disable a `#tags` line, simply add an extra `#` at the beginning, effectively re-enabling the SSH host.  
+
+```sshconfig
+Host will_ananta_in_this_host
+    ##tags home,debian,!ananta
+```
+
 ## Why named "Anata No Minato"
 
 My local disk already has too many git repositories named `docker-XXX`. Since I want to save a few keystrokes when jumping into this project directory, I won't name it `docker-ananta`.

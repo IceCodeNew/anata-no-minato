@@ -40,6 +40,38 @@ ananta -CS fastfetch
 ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```
 
+## Ananta 用の SSH config 活用術
+
+### タグの指定方法
+
+SSH config 内で `#tags` 行を追加し、各ホストにタグを付与します。複数のタグはカンマ（`,`）またはコロン（`:`）で区切って記述できます。例：  
+
+```sshconfig
+Host mynas
+    Hostname 1.1.1.1
+    User root
+    #tags tailscale,debian:nas,home
+```
+
+### 特定のホストを一時的に除外する方法
+
+SSH コマンドを並行実行する際に特定のホストを一時的に除外したい場合は、対象ホストのタグリストに `!ananta` タグを追加してください。  
+
+```sshconfig
+Host do_not_ananta_in_this_host
+    #tags home,debian,!ananta
+```
+
+### タグ行の一時無効化
+
+`#tags` 行の先頭にもう一つの `#` を付けると、その行のタグが全て無効化されます。  
+これにより、Ananta 実行時に該当ホストが通常通り接続対象となります。
+
+```sshconfig
+Host will_ananta_in_this_host
+    ##tags home,debian,!ananta
+```
+
 ## なぜ「あなたのみなと」と名付けたのか
 
 私のパソコにはすでに「docker-XXX」という名前の Git リポジトリが多数存在しており、本プロジェクトはできるだけ少ないキー入力で移動できるように「docker-ananta」という名前を避けています。  

@@ -38,6 +38,37 @@ ananta -CS fastfetch
 ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
 ```
 
+## 关于 SSH 配置文件的高级玩法
+
+### 指定标签
+
+你可以在 SSH 配置文件中通过添加 `#tags` 行来为机器分配标签。多个标签可用逗号（`,`）或冒号（`:`）分隔，示例如下：  
+
+```sshconfig
+Host mynas
+    Hostname 1.1.1.1
+    User root
+    #tags tailscale,debian:nas,home
+```
+
+### 在生成 hosts.csv 时临时排除某些机器
+
+如果你想在批量执行 SSH 命令时临时排除某些机器，只需在这些机器的标签列表中添加 `!ananta` 标签。  
+
+```sshconfig
+Host do_not_ananta_in_this_host
+    #tags home,debian,!ananta
+```
+
+### 临时禁用所有标签
+
+如果你想临时禁用某一行 `#tags`，只需在该行行首再加一个 `#`。这样可以在批量执行 SSH 命令时允许 Ananta 连接到这台机器。  
+
+```sshconfig
+Host will_ananta_in_this_host
+    ##tags home,debian,!ananta
+```
+
 ## 项目如何得名
 
 我电脑上的本地磁盘已经有太多 docker-XXX 命名的 git 仓库了，而我想每次都能少敲几个键就能跳转到这个项目下，所以这个项目不能叫 `docker-ananta`。  
