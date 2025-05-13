@@ -48,6 +48,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          persist-credentials: false
       - name: Chores (generate envs & assets)
         id: chores
         run: |
@@ -75,6 +77,9 @@ jobs:
             ${{ env.ananta_repo }}:${{ env.variant }}
             ${{ env.ananta_repo }}:${{ steps.chores.outputs.ver_anata_helper }}
       - name: Smoke Test
+        env:
+          ananta_repo: ${{ env.ananta_repo }}
+          ver_anata_helper: ${{ steps.chores.outputs.ver_anata_helper }}
         run: |
           sudo apt-get update -qq \
               && sudo apt-get -y install \
@@ -107,7 +112,7 @@ jobs:
               exit 1
           fi
 
-          docker save -o "ananta.${{ steps.chores.outputs.ver_anata_helper }}.tar" "${{ env.ananta_repo }}:${{ steps.chores.outputs.ver_anata_helper }}"
+          docker save -o "ananta.${ver_anata_helper}.tar" "${ananta_repo}:${ver_anata_helper}"
 
       -
         name: Build and push
