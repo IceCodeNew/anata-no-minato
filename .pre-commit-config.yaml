@@ -34,6 +34,7 @@ repos:
     hooks:
       - id: actionlint
 
+  # `gitleaks` detects hardcoded secrets in the codebase to prevent accidental exposure.
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.26.0
     hooks:
