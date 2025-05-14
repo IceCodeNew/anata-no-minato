@@ -3,25 +3,24 @@ name = "sshconfig_to_ananta"
 version = "2.0.1"
 description = "Convert SSH config to Ananta hosts CSV format"
 authors = [
-    {name = "IceCodeNew"},
-    {name = "yzqzss" },
+    { name = "IceCodeNew" },
+    { name = "yzqzss" },
 ]
 dependencies = []
 requires-python = ">=3.10"
 readme = "README.md"
 
 [project.urls]
-repository = "https://github.com/IceCodeNew/anata-no-minato"
+homepage = "https://github.com/IceCodeNew/anata-no-minato.git"
+source = "https://github.com/IceCodeNew/anata-no-minato.git"
+issues = "https://github.com/IceCodeNew/anata-no-minato/issues"
 
 [project.scripts]
 sshconfig_to_ananta = "sshconfig_to_ananta.main:main"
-
 
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-
 [tool.pdm]
 distribution = true
-

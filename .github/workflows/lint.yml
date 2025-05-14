@@ -1,13 +1,11 @@
 name: Linter
 permissions:
   contents: read
-  packages: write
   id-token: write
 
 on:
     push:
-      branches:
-      - 'master'
+      branches: [ "master" ]
     pull_request:
 
 jobs:
