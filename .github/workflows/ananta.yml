@@ -63,8 +63,12 @@ jobs:
               echo "variant=dev" >> "$GITHUB_ENV"
               ver_anata_helper='dev'
           fi
-          ver_ananta=$(tr -d '\r\n\t\f\v ' < .ananta_version)
 
+          if [[ ! -s .ananta_version ]]; then
+              echo "ERROR: .ananta_version file not found or is empty"
+              exit 1
+          fi
+          ver_ananta=$(tr -d '\r\n\t\f\v ' < .ananta_version)
           ver_anata_helper="v${ver_anata_helper}-${ver_ananta}"
 
           echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_OUTPUT"
