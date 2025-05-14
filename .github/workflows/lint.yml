@@ -45,10 +45,10 @@ jobs:
         reporter: github-check
     # AutoCorrect
     - name: AutoCorrect
-      uses: huacnlee/autocorrect-action@ecfab7cbe52ead55514356c1322636fab42e060a # v2
+      uses: huacnlee/autocorrect-action@bf91ab3904c2908dd8e71312a8a83ed1eb632997 # main
     - name: Report ReviewDog
       if: failure()
-      uses: huacnlee/autocorrect-action@ecfab7cbe52ead55514356c1322636fab42e060a # v2
+      uses: huacnlee/autocorrect-action@bf91ab3904c2908dd8e71312a8a83ed1eb632997 # main
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
