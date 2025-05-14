@@ -6,8 +6,7 @@ permissions:
 
 on:
   push:
-    branches:
-    - 'master'
+    branches: [ "master" ]
     paths:
     - '.github/workflows/unittest.yml'
     - 'sshconfig_to_ananta/**'

@@ -6,8 +6,7 @@ permissions:
 
 on:
   push:
-    branches:
-    - 'master'
+    branches: [ "master" ]
     paths:
     - '.github/workflows/ananta.yml'
     - 'script/dummy_ananta.sh'
@@ -150,7 +149,7 @@ jobs:
       -
         name: Build and push
         uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: github.event.repository.default_branch == github.ref_name
         with:
           build-args: |
             ver_anata_helper=${{ steps.chores.outputs.ver_anata_helper }}
@@ -167,7 +166,7 @@ jobs:
       -
         name: Release
         uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.event.repository.default_branch == github.ref_name
         with:
           fail_on_unmatched_files: true
           generate_release_notes: true
