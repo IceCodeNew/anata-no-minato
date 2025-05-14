@@ -57,33 +57,14 @@ jobs:
           CACHED_GITHUB_API: ${{ secrets.GH_API_BASEURL }}
         run: |
           set -e -o pipefail
-          TMP_FILE=$(mktemp)
-          if curl --fail --silent --show-error --location --include --head \
-              --header "Accept: application/vnd.github.v3+json" --output "$TMP_FILE" -- \
-              "${CACHED_GITHUB_API}"; then
-
-              HTTP_STATUS_CODE=$(awk 'NR==1 {print $2}' "$TMP_FILE")
-              if [[ $HTTP_STATUS_CODE -ge 200 ]] && [[ $HTTP_STATUS_CODE -le 299 ]]; then
-                  echo "info: github cache is ready. will connect to the cached API instead of the default one"
-                  GITHUB_API_BASEURL="${CACHED_GITHUB_API}"
-              fi
-          fi
-          : "${GITHUB_API_BASEURL:="https://api.github.com"}"
-          "rm" -f "$TMP_FILE"
 
           ver_anata_helper=$(yq -r '.project.version' pyproject.toml | tr -d '\r\n\t\f\v ')
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "variant=dev" >> "$GITHUB_ENV"
               ver_anata_helper='dev'
           fi
+          ver_ananta=$(tr -d '\r\n\t\f\v ' < .ananta_version)
 
-          ananta_latest_tag_name=$(
-              curl -sSL --fail --retry 5 --retry-delay 10 --retry-max-time 60 \
-                  -H 'Accept: application/vnd.github.v3+json' \
-                  "${GITHUB_API_BASEURL}/repos/cwt/ananta/releases/latest" \
-                  | jq -r .tag_name
-          )
-          ver_ananta="${ananta_latest_tag_name##v}"
           ver_anata_helper="v${ver_anata_helper}-${ver_ananta}"
 
           echo "ver_anata_helper=${ver_anata_helper}" >> "$GITHUB_OUTPUT"
