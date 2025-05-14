@@ -44,10 +44,6 @@ repos:
     rev: 2.24.1
     hooks:
       - id: pdm-lock-check
-
-  - repo: https://github.com/pdm-project/pdm
-    rev: 2.24.1
-    hooks:
       - id: pdm-sync
         additional_dependencies:
           - keyring
