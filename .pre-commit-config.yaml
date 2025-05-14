@@ -39,3 +39,11 @@ repos:
     rev: v8.26.0
     hooks:
       - id: gitleaks
+
+  - repo: https://github.com/pdm-project/pdm
+    rev: 2.24.1
+    hooks:
+      - id: pdm-lock-check
+      - id: pdm-sync
+        additional_dependencies:
+          - keyring

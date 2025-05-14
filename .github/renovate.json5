@@ -4,6 +4,7 @@
     // "docker:pinDigests",
     "helpers:pinGitHubActionDigests",
     ":configMigration",
-    // ":pinDevDependencies"
+    // ":pinDevDependencies",
+    "security:openssf-scorecard",
   ]
 }
