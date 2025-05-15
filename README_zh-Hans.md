@@ -4,6 +4,7 @@
   
 [![CI](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/ananta.yml/badge.svg)](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/ananta.yml)
 [![Unittest](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/unittest.yml/badge.svg)](https://github.com/IceCodeNew/anata-no-minato/actions/workflows/unittest.yml)
+[![codecov](https://codecov.io/gh/IceCodeNew/anata-no-minato/graph/badge.svg?token=41TXXKSXUM)](https://codecov.io/gh/IceCodeNew/anata-no-minato)
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/IceCodeNew/anata-no-minato?utm_source=oss&utm_medium=github&utm_campaign=IceCodeNew%2Fanata-no-minato&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 ![PyPI - Version](https://img.shields.io/pypi/v/sshconfig-to-ananta)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FIceCodeNew%2Fanata-no-minato%2Frefs%2Fheads%2Fmaster%2Fpyproject.toml)
