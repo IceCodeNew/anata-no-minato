@@ -53,12 +53,6 @@ Host EdgeCase-1
     IdentityFile ~/.ssh/Filename_With_UpperCase-VeryLongUsername-TheQuickBrownFoxJumpsOverTheLazyDog.pem
     #tags dev,prod
 
-Host Disabled-Host
-    HostName 1.2.3.4
-    Port 1
-    User nonroot
-    #tags dummy,!ananta,test
-
 Host Enabled-Host
     HostName 5.6.7.8
     ##tags dummy,!ananta
@@ -66,6 +60,12 @@ Host Enabled-Host
 Host Proxy-Host
     HostName 9.10.11.12
     ProxyCommand ssh jump-host nc %h %p
+
+Host Disabled-Host--Must-at-Last
+    HostName 1.2.3.4
+    Port 1
+    User nonroot
+    #tags dummy,!ananta,test
 """)
 
         temp_ssh_config.flush()
@@ -97,9 +97,6 @@ Host Proxy-Host
         self.assertIn("dev", edge_case_tags)
         self.assertIn("prod", edge_case_tags)
 
-        disabled_host = [host for host in hosts if host.alias == "Disabled-Host"]
-        self.assertEqual(len(disabled_host), 0)
-
         enabled_host = [host for host in hosts if host.alias == "Enabled-Host"]
         self.assertEqual(len(enabled_host), 1)
         self.assertEqual(enabled_host[0].ip, "5.6.7.8")
@@ -112,6 +109,11 @@ Host Proxy-Host
         self.assertEqual(len(proxy_hosts), 1)
         self.assertEqual(proxy_hosts[0].alias, "Proxy-Host-needs-proxy")
         self.assertEqual(proxy_hosts[0].ip, "9.10.11.12")
+
+        disabled_host = [
+            host for host in hosts if host.alias == "Disabled-Host--Must-at-Last"
+        ]
+        self.assertEqual(len(disabled_host), 0)
 
 
 if __name__ == "__main__":

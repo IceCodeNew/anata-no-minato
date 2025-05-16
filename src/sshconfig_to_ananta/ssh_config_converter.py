@@ -119,7 +119,8 @@ def convert_to_ananta_hosts(
                 pass
 
     if _valid_host(alias):
-        ananta_hosts.append(
-            AnantaHost(alias, ip, port, username, key_path, tags, relocate)
-        )
+        if not _host_disabled(tags):
+            ananta_hosts.append(
+                AnantaHost(alias, ip, port, username, key_path, tags, relocate)
+            )
     return ananta_hosts
