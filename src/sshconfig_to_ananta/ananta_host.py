@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # pyright: strict
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Iterator, List, Optional
 
 
-class AnantaHost:
+class AnantaHost(Mapping[str, Any]):
     """Represents an Ananta host entry.
 
     This class stores the configuration details for connecting to a host
@@ -47,60 +48,65 @@ class AnantaHost:
         tags: List[str],
         relocate: Optional[Path],
     ):
-        _err_msg = f"""
-  alias: {alias}
-  ip: {ip}
-  port: {port}
-  username: {username}
-  key_path: {key_path}
-  tags: {tags}
-  relocate: {relocate}
-"""
-
         if not alias:
-            raise ValueError(f"ERROR: alias cannot be empty.{_err_msg}")
+            raise ValueError("ERROR: alias cannot be empty.")
         self.alias = alias
 
         if not ip:
-            raise ValueError(f"ERROR: ip cannot be empty.{_err_msg}")
+            raise ValueError("ERROR: ip cannot be empty.")
         self.ip = ip
 
         try:
             self.port = int(port) if port else 22
             if not (0 < self.port < 65536):
                 raise ValueError(
-                    f"ERROR: Port number {port} must be greater than 0 and less than 65536.{_err_msg}"
+                    f"ERROR: Port number {port} must be greater than 0 and less than 65536."
                 )
         except (ValueError, TypeError) as e:
-            raise ValueError(f"ERROR: Invalid port number: {port}.{_err_msg}") from e
+            raise ValueError(f"ERROR: Invalid port number: {port}.") from e
 
-        self.username = username if username else "root"
+        self.username = username or "root"
 
-        self.key_path = key_path if key_path else "#"
+        self.key_path = key_path or "#"
         if key_path and relocate:
             key_path_obj = relocate / Path(key_path).name
             if not key_path_obj.is_file():
                 raise FileNotFoundError(
-                    f"ERROR: SSH Key {key_path} could not be found OR it is not a regular file.{_err_msg}"
+                    f"ERROR: SSH Key {key_path} could not be found OR it is not a regular file."
                 )
             self.key_path = str(key_path_obj)
 
-        self.tags = tags if tags else []
+        self.tags = tags
 
         self.relocate = relocate if isinstance(relocate, Path) else None
 
-    def to_string_with_fields(self) -> str:
-        return (
-            f"  alias:    {self.alias}\n"
-            f"  ip:       {self.ip}\n"
-            f"  port:     {str(self.port)}\n"
-            f"  username: {self.username}\n"
-            f"  key_path: {self.key_path}\n"
-            f"  tags:     {','.join(self.tags)}\n"
-        )
+        self._data = {
+            "alias": self.alias,
+            "ip": self.ip,
+            "port": self.port,
+            "username": self.username,
+            "key_path": self.key_path,
+            "tags": self.tags,
+            "relocate": self.relocate,
+        }
 
-    def to_string(self) -> str:
-        parts = [self.alias, self.ip, str(self.port), self.username, self.key_path]
+    def __getitem__(self, key: str) -> Any:
+        return self._data[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._data)
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def dump_comma_separated_str(self) -> str:
+        parts = [
+            self.alias,
+            self.ip,
+            str(self.port),
+            self.username,
+            self.key_path,
+        ]
         if self.tags:
             parts.append(":".join(self.tags))
         return ",".join(parts) + "\n"

@@ -61,7 +61,7 @@ def main():
 
     try:
         with open(csvfile, "w", encoding="utf-8") as file:
-            file.writelines([host.to_string() for host in ananta_hosts])
+            file.writelines(host.dump_comma_separated_str() for host in ananta_hosts)
         logging.info(f"Successfully wrote Ananta hosts to {csvfile}.")
     except Exception as e:
         logging.error(f"Failed to write to {csvfile}: {e}")
