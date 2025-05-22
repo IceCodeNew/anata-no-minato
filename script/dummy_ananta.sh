@@ -10,13 +10,13 @@ while [[ $# -gt 0 ]]; do
     -[hH]|--help)
         # shellcheck disable=SC2016
         echo '
-This helper script will automatically generate hosts.csv based on `~/.ssh/config`, issue the command as below:
-(omit the hosts.csv argument)
+This helper script will automatically generate hosts file based on `~/.ssh/config`, issue the command as below:
+(omit the hosts file argument)
 `ananta -CS fastfetch`
 
-In case you want to specify an existing hosts.csv,
+In case you want to specify an existing hosts file,
    issue the command with the same arguments sequence as the original ananta command:
-`ananta -t arch hosts.csv sudo pacman -Syu --noconfirm`
+`ananta -t arch hosts.toml sudo pacman -Syu --noconfirm`
 '
         exit 0
         ;;
@@ -36,8 +36,8 @@ In case you want to specify an existing hosts.csv,
         ananta_args+=("$1" "$2")
         shift 2
         ;;
-    [!-]*.[cC][sS][vV])
-        hosts_csv="$1"
+    [!-]*.[cC][sS][vV]|[!-]*.[tT][oO][mM][lL])
+        hosts_file="$1"
         shift
         ;;
     *)
@@ -77,11 +77,11 @@ clean_out_date_ananta_images() {
 if [[ "$UID" -ne 65532 ]]; then
     docker_run_args+=('--user' 'root')
 fi
-if [[ -n "$hosts_csv" ]]; then
-    if [[ -f "$hosts_csv" ]]; then
-        docker_run_args+=('--volume' "${hosts_csv}:/home/nonroot/$(basename "$hosts_csv"):ro")
+if [[ -n "$hosts_file" ]]; then
+    if [[ -f "$hosts_file" ]]; then
+        docker_run_args+=('--volume' "${hosts_file}:/home/nonroot/$(basename "$hosts_file"):ro")
     else
-        echo "ERROR: ${hosts_csv} does not exist or is not a regular file."
+        echo "ERROR: ${hosts_file} does not exist or is not a regular file."
         exit 1
     fi
 fi
@@ -98,4 +98,4 @@ docker run --rm \
     --cpu-shares 512 --memory 512M --memory-swap 512M \
     --security-opt no-new-privileges \
     icecodexi/ananta:REPLACE_ME_ANATA_NO_MINATO_VERSION \
-        "${ananta_args[@]}" "$hosts_csv" "${ssh_command[@]}"
+        "${ananta_args[@]}" "$hosts_file" "${ssh_command[@]}"

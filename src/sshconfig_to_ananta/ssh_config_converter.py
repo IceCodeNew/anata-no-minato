@@ -16,8 +16,8 @@ def _read_ssh_config(ssh_path: Path) -> Iterator[str]:
                 yield line
     except FileNotFoundError:
         logging.warning(
-            f"SSH config file could not be found in: {ssh_path}, hosts.csv could not be generated. "
-            "To proceed, make sure you have provided a valid hosts.csv file. "
+            f"SSH config file could not be found in: {ssh_path}, hosts file could not be generated. "
+            "To proceed, make sure you have provided a valid hosts file. "
         )
     except Exception as e:
         logging.error(f"Failed to read SSH config file at {ssh_path}: {e}")

@@ -10,6 +10,11 @@ dependencies = []
 requires-python = ">=3.10"
 readme = "README.md"
 
+[project.optional-dependencies]
+toml = [
+    "tomli-w>=1.2.0",
+]
+
 [project.urls]
 homepage = "https://github.com/IceCodeNew/anata-no-minato.git"
 source = "https://github.com/IceCodeNew/anata-no-minato.git"

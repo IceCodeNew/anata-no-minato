@@ -5,8 +5,16 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from types import ModuleType
+from typing import Optional
 
 from sshconfig_to_ananta.ssh_config_converter import convert_to_ananta_hosts
+
+tomli_w: Optional[ModuleType] = None
+try:
+    import tomli_w
+except ImportError:
+    pass  # toml support is optional
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,7 +25,8 @@ logging.basicConfig(
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Convert SSH config to Ananta hosts csv."
+        description="Convert SSH config to a list of SSH servers that Ananta can recognize. "
+        "Emits TOML output if the 'tomli_w' module is available."
     )
     parser.add_argument(
         "--ssh",
@@ -32,8 +41,8 @@ def parse_arguments():
         type=Path,
     )
     parser.add_argument(
-        "csvfile",
-        help="Path the Ananta hosts file would be written to. (better set to a path that can safely overwrite)",
+        "server_list",
+        help="Path the list of SSH servers would be written to. (better set to a path that can safely overwrite)",
         type=Path,
     )
     return parser.parse_args()
@@ -42,12 +51,14 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     ssh_path = args.ssh
-    csvfile = args.csvfile
+    server_list = Path(args.server_list)
     relocate = Path(args.relocate).resolve(strict=True) if args.relocate else None
 
-    if csvfile.is_dir() or csvfile.is_symlink():
+    if tomli_w and server_list.suffix != ".toml":
+        server_list = server_list.with_suffix(".toml")
+    if server_list.is_dir() or server_list.is_symlink():
         raise IsADirectoryError(
-            f"ERROR: {csvfile} is a directory OR a symlink. Script aborted to prevent data loss."
+            f"ERROR: {server_list} is a directory OR a symlink. Script aborted to prevent data loss."
         )
     if relocate and not relocate.is_dir():
         raise NotADirectoryError(f"ERROR: relocate path {relocate} is not a directory.")
@@ -60,11 +71,17 @@ def main():
         sys.exit(1)
 
     try:
-        with open(csvfile, "w", encoding="utf-8") as file:
-            file.writelines(host.dump_comma_separated_str() for host in ananta_hosts)
-        logging.info(f"Successfully wrote Ananta hosts to {csvfile}.")
+        with open(server_list, "w", encoding="utf-8") as file:
+            if tomli_w:
+                toml_data = {host.alias: host.dump_host_info() for host in ananta_hosts}
+                file.write(tomli_w.dumps(toml_data))
+            else:
+                file.writelines(
+                    host.dump_comma_separated_str() for host in ananta_hosts
+                )
+        logging.info("Successfully wrote Ananta hosts to %s.", server_list)
     except Exception as e:
-        logging.error(f"Failed to write to {csvfile}: {e}")
+        logging.exception("Failed to write to %s: %s", server_list, e)
         raise
 
 

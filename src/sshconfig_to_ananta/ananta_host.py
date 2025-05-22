@@ -110,3 +110,11 @@ class AnantaHost(Mapping[str, Any]):
         if self.tags:
             parts.append(":".join(self.tags))
         return ",".join(parts) + "\n"
+
+    def dump_host_info(self) -> Mapping[str, Any]:
+        host_info = {
+            k: v
+            for k, v in self._data.items()
+            if k != "alias" and k != "relocate" and v
+        }
+        return host_info

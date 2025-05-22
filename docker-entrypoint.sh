@@ -4,7 +4,7 @@ set -e -o pipefail
 cd /home/nonroot/.ssh/ || exit 1
 ananta_args=()
 ssh_command=()
-hosts_csv="/home/nonroot/_autogen_hosts.csv"
+hosts_file="/home/nonroot/_autogen_hosts.toml"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     ''|[!-]*)
-        _HOSTS_CSV="$1"
+        _hosts_file="$1"
         shift
         # Stop processing remaining arguments
         ssh_command=("$@")
@@ -39,16 +39,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ -n "$_HOSTS_CSV" ]]; then
-    # Modify the hosts.csv path to be under /home/nonroot/
-    hosts_csv="/home/nonroot/$(basename "$_HOSTS_CSV")"
+if [[ -n "$_hosts_file" ]]; then
+    # Modify the hosts file path to be under /home/nonroot/
+    hosts_file="/home/nonroot/$(basename "$_hosts_file")"
 else
     echo "INFO: Will try to generate one using the SSH config..."
     sshconfig_to_ananta \
         --ssh /home/nonroot/.ssh/config \
         --relocate /home/nonroot/.ssh/ \
-        "$hosts_csv"
+        "$hosts_file"
 fi
 
 # Run the ananta command with the modified arguments
-exec catatonit -- ananta "${ananta_args[@]}" "$hosts_csv" "${ssh_command[@]}"
+exec catatonit -- ananta "${ananta_args[@]}" "$hosts_file" "${ssh_command[@]}"

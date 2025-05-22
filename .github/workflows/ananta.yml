@@ -117,7 +117,7 @@ jobs:
               IdentityFile ${HOME}/.ssh/ed25519
           EEOOFF
 
-          #1: no hosts.csv; ananta arguments specified
+          #1: no hosts file; ananta arguments specified
           bash -x assets/ananta --run-in-ci --no-color whoami \
               | tee /tmp/smoke-test.log
           if ! grep -qE '\[testServer\]\s+runner' /tmp/smoke-test.log; then
@@ -125,7 +125,7 @@ jobs:
               exit 1
           fi
 
-          #2: no hosts.csv; no ananta arguments
+          #2: no hosts file; no ananta arguments
           bash -x assets/ananta --run-in-ci whoami \
               | tee /tmp/smoke-test.log
           if ! grep -qF 'runner' /tmp/smoke-test.log; then
