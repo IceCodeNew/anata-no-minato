@@ -54,12 +54,6 @@ def main():
     server_list = Path(args.server_list)
     relocate = Path(args.relocate).resolve(strict=True) if args.relocate else None
 
-    if tomli_w and server_list.suffix != ".toml":
-        server_list = server_list.with_suffix(".toml")
-    if server_list.is_dir() or server_list.is_symlink():
-        raise IsADirectoryError(
-            f"ERROR: {server_list} is a directory OR a symlink. Script aborted to prevent data loss."
-        )
     if relocate and not relocate.is_dir():
         raise NotADirectoryError(f"ERROR: relocate path {relocate} is not a directory.")
 
@@ -71,11 +65,14 @@ def main():
         sys.exit(1)
 
     try:
-        with open(server_list, "w", encoding="utf-8") as file:
-            if tomli_w:
+        if tomli_w:
+            if server_list.suffix != ".toml":
+                server_list = server_list.with_suffix(".toml")
+            with open(server_list, "wb") as file:
                 toml_data = {host.alias: host.dump_host_info() for host in ananta_hosts}
-                file.write(tomli_w.dumps(toml_data))
-            else:
+                tomli_w.dump(toml_data, file)
+        else:
+            with open(server_list, "w", encoding="utf-8") as file:
                 file.writelines(
                     host.dump_comma_separated_str() for host in ananta_hosts
                 )
