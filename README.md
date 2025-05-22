@@ -12,7 +12,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/IceCodeNew/anata-no-minato/badge)](https://scorecard.dev/viewer/?uri=github.com/IceCodeNew/anata-no-minato)
   
 This project is an attempt to packaging the [Ananta](https://github.com/cwt/ananta) with its runtime into a minimum, hardened docker image, while also providing a convenient way to use it.  
-It is recommended to bind mount the `${HOME}/.ssh/` into the container, and the container will automatically generate `hosts.csv` based on `~/.ssh/config` for you.  
+It is recommended to bind mount the `${HOME}/.ssh/` into the container, and the container will automatically generate `hosts.toml` based on `~/.ssh/config` for you.  
   
 Since it is routine for me to spend lot of my labour hours in an air-gapped environment, a docker image seems to be the best way to package some of my favourite tools.  
 
@@ -31,18 +31,18 @@ sudo install -pvD ./ananta /usr/local/bin/
 rm ./ananta
 ```
 
-This helper script will automatically generate hosts.csv based on `~/.ssh/config`, issue the command as below:  
-(omit the hosts.csv argument)  
+This helper script will automatically generate hosts.toml based on `~/.ssh/config`, issue the command as below:  
+(omit the hosts.toml argument)  
 
 ```shell
 ananta -CS fastfetch
 ```
 
-In case you want to specify an existing hosts.csv,  
+In case you want to specify an existing hosts.toml,  
    issue the command with the same arguments sequence as the original ananta command:  
 
 ```shell
-ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
+ananta -t arch hosts.toml sudo pacman -Syu --noconfirm
 ```
 
 ## Hacking SSH Config for Ananta
@@ -58,9 +58,9 @@ Host mynas
     #tags tailscale,debian:nas,home
 ```
 
-### Excluding a Host from hosts.csv Generation
+### Excluding a Host from hosts.toml Generation
 
-To exclude a host from the generated `hosts.csv` file, add the `!ananta` tag to its tags list. Any host marked with this tag will be skipped during the generation process.  
+To exclude a host from the generated `hosts.toml` file, add the `!ananta` tag to its tags list. Any host marked with this tag will be skipped during the generation process.  
 
 ```sshconfig
 Host do_not_ananta_in_this_host

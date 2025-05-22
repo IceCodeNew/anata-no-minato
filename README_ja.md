@@ -12,7 +12,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/IceCodeNew/anata-no-minato/badge)](https://scorecard.dev/viewer/?uri=github.com/IceCodeNew/anata-no-minato)
   
 このプロジェクトは、[Ananta](https://github.com/cwt/ananta) とその完全なランタイム環境を内包した状態で、最小限のコンテナイメージを作成したものです。セキュリティを強化しつつ、不便さを感じさせないよう自動化スクリプトを導入し、操作性を向上させました。  
-利用時には `${HOME}/.ssh/` ディレクトリをコンテナ内にマウントすることを推奨します。コンテナは `~/.ssh/config` に基づいて `hosts.csv` を自動生成します。  
+利用時には `${HOME}/.ssh/` ディレクトリをコンテナ内にマウントすることを推奨します。コンテナは `~/.ssh/config` に基づいて `hosts.toml` を自動生成します。  
   
 接続が制限された環境での作業を想定し、エアギャップ環境におけるツールのインストールおよび運用を容易にするために、本プロジェクトを立ち上げました。  
 
@@ -31,19 +31,19 @@ sudo install -pvD ./ananta /usr/local/bin/
 rm ./ananta
 ```
 
-このヘルパースクリプトは、`~/.ssh/config` をもとに `hosts.csv` ファイルを自動生成します。  
-これにより、ananta ツールを実行する際に、あらかじめ `hosts.csv` を用意する必要がなくなります。  
+このヘルパースクリプトは、`~/.ssh/config` をもとに `hosts.toml` ファイルを自動生成します。  
+これにより、ananta ツールを実行する際に、あらかじめ `hosts.toml` を用意する必要がなくなります。  
 実行例：  
 
 ```shell
 ananta -CS fastfetch
 ```
 
-なお、`hosts.csv` ファイルを指定したい場合は、公式 ananta ツールと同様のパラメータ順でコマンドを実行してください。  
+なお、`hosts.toml` ファイルを指定したい場合は、公式 ananta ツールと同様のパラメータ順でコマンドを実行してください。  
 実行例：  
 
 ```shell
-ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
+ananta -t arch hosts.toml sudo pacman -Syu --noconfirm
 ```
 
 ## Ananta 用の SSH config 活用術

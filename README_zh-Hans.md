@@ -12,7 +12,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/IceCodeNew/anata-no-minato/badge)](https://scorecard.dev/viewer/?uri=github.com/IceCodeNew/anata-no-minato)
   
 这个项目将 [Ananta](https://github.com/cwt/ananta) 及其所需的完整运行时打包到一个极简的、安全加固过的容器镜像中，并带上了一些自动化脚本来简化使用体验。  
-在使用该项目时，推荐将 `${HOME}/.ssh/` 挂载到容器中，容器会自动根据 `~/.ssh/config` 生成 `hosts.csv` 文件。  
+在使用该项目时，推荐将 `${HOME}/.ssh/` 挂载到容器中，容器会自动根据 `~/.ssh/config` 生成 `hosts.toml` 文件。  
   
 由于经常需要在没有外网的环境中工作，我创建了这个项目用来方便在气隙环境中安装和使用 Ananta。  
 
@@ -31,17 +31,17 @@ sudo install -pvD ./ananta /usr/local/bin/
 rm ./ananta
 ```
 
-这个帮助脚本会自动根据 `~/.ssh/config` 生成 `hosts.csv` 文件，这样您执行 ananta 命令时就无需再指定 hosts.csv 文件：  
-（注意这里相比上游的 ananta README，省略了中间的 hosts.csv 参数）  
+这个帮助脚本会自动根据 `~/.ssh/config` 生成 `hosts.toml` 文件，这样您执行 ananta 命令时就无需再指定 hosts.toml 文件：  
+（注意这里相比上游的 ananta README，省略了中间的 hosts.toml 参数）  
 
 ```shell
 ananta -CS fastfetch
 ```
 
-如果您不需要上述功能，可使用和上游一致的参数顺序来指定 hosts.csv 文件，如下所示：  
+如果您不需要上述功能，可使用和上游一致的参数顺序来指定 hosts.toml 文件，如下所示：  
 
 ```shell
-ananta -t arch hosts.csv sudo pacman -Syu --noconfirm
+ananta -t arch hosts.toml sudo pacman -Syu --noconfirm
 ```
 
 ## 关于 SSH 配置文件的高级玩法
@@ -57,7 +57,7 @@ Host mynas
     #tags tailscale,debian:nas,home
 ```
 
-### 在生成 hosts.csv 时临时排除某些机器
+### 在生成 hosts.toml 时临时排除某些机器
 
 如果你想在批量执行 SSH 命令时临时排除某些机器，只需在这些机器的标签列表中添加 `!ananta` 标签。  
 

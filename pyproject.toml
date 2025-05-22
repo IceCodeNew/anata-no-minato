@@ -1,7 +1,7 @@
 [project]
 name = "sshconfig_to_ananta"
-version = "2.0.2"
-description = "Convert SSH config to Ananta hosts CSV format"
+version = "2.1.0"
+description = "Convert SSH config to Ananta hosts format (CSV or TOML)"
 authors = [
     { name = "IceCodeNew" },
     { name = "yzqzss" },
@@ -9,6 +9,11 @@ authors = [
 dependencies = []
 requires-python = ">=3.10"
 readme = "README.md"
+
+[project.optional-dependencies]
+toml = [
+    "tomli-w>=1.2.0",
+]
 
 [project.urls]
 homepage = "https://github.com/IceCodeNew/anata-no-minato.git"

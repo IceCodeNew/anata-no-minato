@@ -17,7 +17,8 @@ RUN uv --no-progress tool install "ananta[speed]==${ver_ananta}"
 COPY --link --chown=65532:65532 /src/ /home/nonroot/sshconfig_to_ananta/src/
 RUN --mount=type=bind,source=README.md,target=/home/nonroot/sshconfig_to_ananta/README.md \
     --mount=type=bind,source=pyproject.toml,target=/home/nonroot/sshconfig_to_ananta/pyproject.toml \
-    uv --no-progress tool install /home/nonroot/sshconfig_to_ananta/
+    uv --no-progress tool install --with tomli-w==1.2.0 \
+        /home/nonroot/sshconfig_to_ananta/
 
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets

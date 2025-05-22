@@ -101,17 +101,8 @@ class TestAnantaHost(unittest.TestCase):
                 relocate=relocate,
             )
             self.assertEqual(
-                host.to_string(),
+                host.dump_comma_separated_str(),
                 f"web,10.0.0.1,22,admin,{relocated_key},web:dev\n",
-            )
-            self.assertEqual(
-                host.to_string_with_fields(),
-                f"  alias:    web\n"
-                f"  ip:       10.0.0.1\n"
-                f"  port:     22\n"
-                f"  username: admin\n"
-                f"  key_path: {relocated_key}\n"
-                f"  tags:     web,dev\n",
             )
 
 
