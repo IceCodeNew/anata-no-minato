@@ -36,7 +36,6 @@ class AnantaHost(Mapping[str, Any]):
     username: str
     key_path: str
     tags: List[str]
-    relocate: Optional[Path]
 
     def __init__(
         self,
@@ -78,8 +77,6 @@ class AnantaHost(Mapping[str, Any]):
 
         self.tags = tags
 
-        self.relocate = relocate if isinstance(relocate, Path) else None
-
         self._data = {
             "alias": self.alias,
             "ip": self.ip,
@@ -87,7 +84,6 @@ class AnantaHost(Mapping[str, Any]):
             "username": self.username,
             "key_path": self.key_path,
             "tags": self.tags,
-            "relocate": self.relocate,
         }
 
     def __getitem__(self, key: str) -> Any:
@@ -112,9 +108,5 @@ class AnantaHost(Mapping[str, Any]):
         return ",".join(parts) + "\n"
 
     def dump_host_info(self) -> Mapping[str, Any]:
-        host_info = {
-            k: v
-            for k, v in self._data.items()
-            if k != "alias" and k != "relocate" and v
-        }
+        host_info = {k: v for k, v in self._data.items() if k != "alias" and v}
         return host_info
