@@ -3,7 +3,7 @@
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Iterator, List, Optional
+from typing import Any, Iterator, List, Literal, Optional, overload
 
 
 class AnantaHost(Mapping[str, Any]):
@@ -85,6 +85,24 @@ class AnantaHost(Mapping[str, Any]):
             "key_path": self.key_path,
             "tags": self.tags,
         }
+
+    @overload
+    def __getitem__(self, key: Literal["alias"]) -> str: ...
+
+    @overload
+    def __getitem__(self, key: Literal["ip"]) -> str: ...
+
+    @overload
+    def __getitem__(self, key: Literal["port"]) -> int: ...
+
+    @overload
+    def __getitem__(self, key: Literal["username"]) -> str: ...
+
+    @overload
+    def __getitem__(self, key: Literal["key_path"]) -> str: ...
+
+    @overload
+    def __getitem__(self, key: Literal["tags"]) -> List[str]: ...
 
     def __getitem__(self, key: str) -> Any:
         return self._data[key]
