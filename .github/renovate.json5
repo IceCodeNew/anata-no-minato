@@ -8,6 +8,7 @@
     ":configMigration",
     // ":pinDevDependencies",
     "security:openssf-scorecard",
+    "customManagers:dockerfileVersions",
   ],
   "customManagers": [
     {

@@ -14,10 +14,12 @@ ARG ver_ananta
 RUN uv --no-progress tool install "ananta[speed]==${ver_ananta}"
 
 # install sshconfig_to_ananta
+# renovate: datasource=pypi depName=tomli-w
+ARG TOMLI_W_VERSION=1.2.0
 COPY --link --chown=65532:65532 /src/ /home/nonroot/sshconfig_to_ananta/src/
 RUN --mount=type=bind,source=README.md,target=/home/nonroot/sshconfig_to_ananta/README.md \
     --mount=type=bind,source=pyproject.toml,target=/home/nonroot/sshconfig_to_ananta/pyproject.toml \
-    uv --no-progress tool install --with tomli-w==1.2.0 \
+    uv --no-progress tool install --with "tomli-w==${TOMLI_W_VERSION}" \
         /home/nonroot/sshconfig_to_ananta/
 
 
