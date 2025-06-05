@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# pyright: strict
+
 import tempfile
 import unittest
 from pathlib import Path
