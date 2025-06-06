@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     # Keep other parameters unchanged
-    -[nNsSeEcCvV]|--no-color|--separate-output|--allow-empty-line|--allow-cursor-control|--version)
+    -[nNsSeEcCvV]|--no-color|--separate-output|--allow-empty-line|--allow-cursor-control|--version|--tui)
         ananta_args+=("$1")
         shift
         ;;
