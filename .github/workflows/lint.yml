@@ -1,7 +1,7 @@
 name: Linter
 permissions:
-  contents: read
-  id-token: write
+  pull-requests: read
+  checks: write
 
 on:
     push:
