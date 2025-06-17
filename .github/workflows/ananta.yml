@@ -1,7 +1,4 @@
 name: ananta Image CI
-permissions:
-  contents: write
-  id-token: write
 
 on:
   push:
@@ -41,6 +38,9 @@ jobs:
   ananta:
     runs-on: ubuntu-latest
     steps:
+      - uses: GitHubSecurityLab/actions-permissions/monitor@v1
+        with:
+          config: ${{ vars.PERMISSIONS_CONFIG }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
