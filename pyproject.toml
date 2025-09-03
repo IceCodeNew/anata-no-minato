@@ -1,6 +1,6 @@
 [project]
 name = "sshconfig_to_ananta"
-version = "2.1.0"
+version = "2.1.1"
 description = "Convert SSH config to Ananta hosts format (CSV or TOML)"
 authors = [
     { name = "IceCodeNew" },

@@ -37,7 +37,7 @@ def parse_arguments():
     parser.add_argument(
         "--relocate",
         help="Relocate the SSH directory to the specified path. (for the container use cases)",
-        default="",
+        default=None,
         type=Path,
     )
     parser.add_argument(
