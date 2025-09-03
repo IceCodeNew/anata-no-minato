@@ -71,7 +71,7 @@ class AnantaHost(Mapping[str, Any]):
             key_path_obj = relocate / Path(key_path).name
             if not key_path_obj.is_file():
                 raise FileNotFoundError(
-                    f"ERROR: SSH Key {key_path} could not be found OR it is not a regular file."
+                    f"ERROR: SSH Key {key_path_obj} could not be found OR it is not a regular file."
                 )
             self.key_path = str(key_path_obj)
 
