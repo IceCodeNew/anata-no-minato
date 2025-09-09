@@ -9,12 +9,26 @@ from sshconfig_to_ananta.ssh_config_converter import (
     _host_disabled,
     _parse_valid_line,
     _process_proxy_warning,
+    _read_ssh_config,
     _valid_host,
     convert_to_ananta_hosts,
 )
 
 
 class TestSSHConfigConverter(unittest.TestCase):
+    def _convert_from_text(self, text: str) -> list:
+        """Helper function to convert SSH config text to hosts."""
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as tf:
+            tf.write(text)
+            tf.flush()
+            path = Path(tf.name)
+        try:
+            return convert_to_ananta_hosts(path, None)
+        finally:
+            path.unlink(missing_ok=True)
+
     def test_parse_valid_line(self):
         self.assertEqual(_parse_valid_line("Host myserver"), ("host", "myserver"))
         self.assertIsNone(_parse_valid_line("# Comment line"))
@@ -117,6 +131,238 @@ Host Disabled-Host--Must-at-Last
             host for host in hosts if host.alias == "Disabled-Host--Must-at-Last"
         ]
         self.assertEqual(len(disabled_host), 0)
+
+    def test_read_ssh_config_file_not_found(self):
+        """Test _read_ssh_config with FileNotFoundError."""
+        # Create a non-existent path
+        non_existent_path = Path("/non/existent/path")
+
+        # Capture logging output
+        with self.assertLogs(level="WARNING") as log:
+            result = list(_read_ssh_config(non_existent_path))
+            self.assertEqual(len(result), 0)
+
+        # Check that warning was logged
+        self.assertTrue(
+            any("SSH config file could not be found" in m for m in log.output)
+        )
+
+    def test_read_ssh_config_generic_exception(self):
+        """Test _read_ssh_config with generic Exception."""
+        from unittest.mock import patch
+
+        # Create a mock file that raises an exception
+        with patch("builtins.open", side_effect=Exception("Permission denied")):
+            with self.assertLogs(level="ERROR") as log:
+                result = list(_read_ssh_config(Path("/some/path")))
+                self.assertEqual(len(result), 0)
+
+        # Check that error was logged
+        self.assertTrue(any("Failed to read SSH config file" in m for m in log.output))
+
+    def test_convert_to_ananta_hosts_wildcard_host(self):
+        """Test convert_to_ananta_hosts with wildcard host names."""
+        # Create test SSH config with wildcard hosts
+        ssh_config_content = """
+Host *.example.com
+    HostName 192.168.1.100
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    
+Host *
+    HostName 192.168.1.200
+    User root
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa_root
+"""
+
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+
+            try:
+                # Convert SSH config to Ananta hosts
+                hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+
+                # Should be empty because wildcard hosts are filtered out
+                self.assertEqual(len(hosts), 0)
+
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
+
+    def test_convert_to_ananta_hosts_empty_host(self):
+        """Test convert_to_ananta_hosts with empty host names."""
+        # Create test SSH config with empty host
+        ssh_config_content = """
+Host 
+    HostName 192.168.1.100
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    
+Host    # Just whitespace
+    HostName 192.168.1.200
+    User root
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa_root
+"""
+
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+
+            try:
+                # Convert SSH config to Ananta hosts
+                hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+
+                # Should be empty because empty hosts are filtered out
+                self.assertEqual(len(hosts), 0)
+
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
+
+    def test_convert_to_ananta_hosts_disabled_host(self):
+        """Test convert_to_ananta_hosts with disabled hosts."""
+        # Create test SSH config with disabled hosts
+        ssh_config_content = """
+Host test-host
+    HostName 192.168.1.100
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    #tags dev,!ananta
+    
+Host another-host
+    HostName 192.168.1.200
+    User root
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa_root
+    #tags prod,!ananta:test
+"""
+
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+
+            try:
+                # Convert SSH config to Ananta hosts
+                hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+
+                # Should be empty because hosts are disabled
+                self.assertEqual(len(hosts), 0)
+
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
+
+    def test_convert_to_ananta_hosts_proxy_warning(self):
+        """Test convert_to_ananta_hosts with proxy command (should trigger warning)."""
+        # Create test SSH config with proxy command
+        ssh_config_content = """
+Host test-host
+    HostName 192.168.1.100
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    ProxyCommand nc -x proxy.example.com:8080 %h %p
+"""
+
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+
+            try:
+                # Capture logging output
+                with self.assertLogs(level="WARNING") as log:
+                    hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+
+                # Should have one host with modified alias
+                self.assertEqual(len(hosts), 1)
+                self.assertEqual(hosts[0].alias, "test-host-needs-proxy")
+
+                # Check that proxy warning was logged
+                self.assertIn(
+                    "SSH host test-host is configured with ProxyCommand/ProxyJump",
+                    log.output[0],
+                )
+
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
+
+    def test_convert_to_ananta_hosts_proxyjump_warning(self):
+        """Test convert_to_ananta_hosts with proxy jump (should trigger warning)."""
+        # Create test SSH config with proxy jump
+        ssh_config_content = """
+Host jumpy
+    HostName 10.0.0.5
+    User admin
+    ProxyJump bastion.example.com
+"""
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+            try:
+                # Capture logging output
+                with self.assertLogs(level="WARNING") as log:
+                    hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+                # Should have one host with modified alias
+                self.assertEqual(len(hosts), 1)
+                self.assertEqual(hosts[0].alias, "jumpy-needs-proxy")
+                # Check that proxy warning was logged
+                self.assertTrue(any("ProxyCommand/ProxyJump" in m for m in log.output))
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
+
+    def test_convert_to_ananta_hosts_unknown_directive(self):
+        """Test convert_to_ananta_hosts with unknown SSH directive."""
+        # Create test SSH config with unknown directive
+        ssh_config_content = """
+Host test-host
+    HostName 192.168.1.100
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    UnknownDirective some-value
+"""
+
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+
+            try:
+                # Should work fine with unknown directive (hits default case)
+                hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+
+                # Should have one host
+                self.assertEqual(len(hosts), 1)
+                self.assertEqual(hosts[0].alias, "test-host")
+
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
 
 
 if __name__ == "__main__":

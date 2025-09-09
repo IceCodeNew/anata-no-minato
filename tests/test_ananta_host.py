@@ -108,6 +108,100 @@ class TestAnantaHost(unittest.TestCase):
                 f"web,10.0.0.1,22,admin,{relocated_key},web:dev\n",
             )
 
+    def test_ananta_host_getitem(self):
+        """Test AnantaHost __getitem__ method."""
+        host = AnantaHost(
+            "testhost",
+            "192.168.1.1",
+            "22",
+            "user",
+            "/path/to/key",
+            ["tag1", "tag2"],
+            None,
+        )
+
+        # Test accessing existing key
+        self.assertEqual(host["alias"], "testhost")
+        self.assertEqual(host["ip"], "192.168.1.1")
+        self.assertEqual(host["port"], 22)
+        self.assertEqual(host["username"], "user")
+        self.assertEqual(host["key_path"], "/path/to/key")
+        self.assertEqual(host["tags"], ["tag1", "tag2"])
+
+        # Test accessing non-existent key
+        with self.assertRaises(KeyError):
+            host["nonexistent"]
+
+    def test_ananta_host_iter(self):
+        """Test AnantaHost __iter__ method."""
+        host = AnantaHost(
+            "testhost",
+            "192.168.1.1",
+            "22",
+            "user",
+            "/path/to/key",
+            ["tag1", "tag2"],
+            None,
+        )
+
+        # Test iteration over keys
+        keys = list(host)
+        expected_keys = ["alias", "ip", "port", "username", "key_path", "tags"]
+        self.assertCountEqual(keys, expected_keys)
+
+    def test_ananta_host_len(self):
+        """Test AnantaHost __len__ method."""
+        host = AnantaHost(
+            "testhost",
+            "192.168.1.1",
+            "22",
+            "user",
+            "/path/to/key",
+            ["tag1", "tag2"],
+            None,
+        )
+
+        # Test length
+        self.assertEqual(len(host), 6)  # alias, ip, port, username, key_path, tags
+
+    def test_ananta_host_dump_host_info(self):
+        """Test AnantaHost dump_host_info method."""
+        host = AnantaHost(
+            "testhost",
+            "192.168.1.1",
+            "22",
+            "user",
+            "/path/to/key",
+            ["tag1", "tag2"],
+            None,
+        )
+
+        # Test dump_host_info excludes alias and empty values
+        host_info = host.dump_host_info()
+        expected_info = {
+            "ip": "192.168.1.1",
+            "port": 22,
+            "username": "user",
+            "key_path": "/path/to/key",
+            "tags": ["tag1", "tag2"],
+        }
+        self.assertEqual(host_info, expected_info)
+
+    def test_ananta_host_dump_host_info_with_empty_values(self):
+        """Test AnantaHost dump_host_info method with empty values."""
+        host = AnantaHost("testhost", "192.168.1.1", "22", "", "", [], None)
+
+        # Test dump_host_info excludes alias and empty values
+        # Note: empty username gets default "root", empty key_path gets default "#"
+        host_info = host.dump_host_info()
+        expected_info = {
+            "ip": "192.168.1.1",
+            "port": 22,
+            "username": "root",
+            "key_path": "#",
+        }
+        self.assertEqual(host_info, expected_info)
+
 
 if __name__ == "__main__":
     unittest.main()
