@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 FROM ghcr.io/astral-sh/uv:latest AS distroless-uv
-FROM mirror.gcr.io/icecodexi/python:debian-nonroot AS uv
+FROM mirror.gcr.io/icecodexi/python:debian12-nonroot AS uv
 COPY --link --from=distroless-uv /uv /uvx \
     /usr/local/bin/
 ENV PATH="/home/nonroot/.local/bin:${PATH}" \
