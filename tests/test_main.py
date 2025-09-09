@@ -84,8 +84,10 @@ class TestMain(unittest.TestCase):
         # Mock the convert function to return empty list
         mock_convert.return_value = []
 
-        # Create a temporary file for testing
-        with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+        # Create a temporary file with .toml extension for testing
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".toml", delete=False
+        ) as temp_file:
             temp_path = Path(temp_file.name)
 
         try:
