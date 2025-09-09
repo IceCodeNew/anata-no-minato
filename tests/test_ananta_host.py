@@ -113,7 +113,7 @@ class TestAnantaHost(unittest.TestCase):
         host = AnantaHost(
             "testhost",
             "192.168.1.1",
-            22,
+            "22",
             "user",
             "/path/to/key",
             ["tag1", "tag2"],
@@ -137,7 +137,7 @@ class TestAnantaHost(unittest.TestCase):
         host = AnantaHost(
             "testhost",
             "192.168.1.1",
-            22,
+            "22",
             "user",
             "/path/to/key",
             ["tag1", "tag2"],
@@ -147,14 +147,14 @@ class TestAnantaHost(unittest.TestCase):
         # Test iteration over keys
         keys = list(host)
         expected_keys = ["alias", "ip", "port", "username", "key_path", "tags"]
-        self.assertEqual(sorted(keys), sorted(expected_keys))
+        self.assertCountEqual(keys, expected_keys)
 
     def test_ananta_host_len(self):
         """Test AnantaHost __len__ method."""
         host = AnantaHost(
             "testhost",
             "192.168.1.1",
-            22,
+            "22",
             "user",
             "/path/to/key",
             ["tag1", "tag2"],
@@ -169,7 +169,7 @@ class TestAnantaHost(unittest.TestCase):
         host = AnantaHost(
             "testhost",
             "192.168.1.1",
-            22,
+            "22",
             "user",
             "/path/to/key",
             ["tag1", "tag2"],
@@ -189,7 +189,7 @@ class TestAnantaHost(unittest.TestCase):
 
     def test_ananta_host_dump_host_info_with_empty_values(self):
         """Test AnantaHost dump_host_info method with empty values."""
-        host = AnantaHost("testhost", "192.168.1.1", 22, "", "", [], None)
+        host = AnantaHost("testhost", "192.168.1.1", "22", "", "", [], None)
 
         # Test dump_host_info excludes alias and empty values
         # Note: empty username gets default "root", empty key_path gets default "#"

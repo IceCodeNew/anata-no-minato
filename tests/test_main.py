@@ -70,6 +70,8 @@ class TestMain(unittest.TestCase):
 
             # Verify file was opened for writing
             mock_file.assert_called_once_with(temp_path, "w", encoding="utf-8")
+            # Verify CSV content path uses writelines
+            mock_file().writelines.assert_called()
 
         finally:
             # Clean up
@@ -101,6 +103,8 @@ class TestMain(unittest.TestCase):
 
             # Verify toml dump was called
             mock_tomli_w.dump.assert_called_once()
+            dumped_args, _ = mock_tomli_w.dump.call_args
+            self.assertEqual(dumped_args[0], {})
             # Verify TOML file is opened in binary mode
             mock_file.assert_called_once_with(temp_path, "wb")
 

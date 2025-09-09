@@ -53,19 +53,13 @@ class TestMainModule(unittest.TestCase):
         self.assertIn("main()", source)
 
     def test_main_module_direct_execution_simulation(self):
-        """Test that would cover the main() call in __main__.py line 7."""
-        # This test simulates the direct execution scenario
-        # In real execution, __name__ would be "__main__" and main() would be called
+        """Simulate __main__ execution and assert main() is invoked."""
+        from runpy import run_module
 
-        # We can't actually test this without running the module directly
-        # But we can verify the structure is correct
-        import sshconfig_to_ananta.__main__
-
-        # Check that the module has the expected structure
-        self.assertTrue(callable(getattr(sshconfig_to_ananta.__main__, "main", None)))
-
-        # The line we want to cover is: if __name__ == "__main__": main()
-        # This line only executes when the module is run directly, not imported
+        with patch("sshconfig_to_ananta.main.main") as mock_main:
+            with patch.object(sys, "argv", ["sshconfig_to_ananta.__main__", "out.csv"]):
+                run_module("sshconfig_to_ananta.__main__", run_name="__main__")
+            mock_main.assert_called_once()
 
 
 if __name__ == "__main__":

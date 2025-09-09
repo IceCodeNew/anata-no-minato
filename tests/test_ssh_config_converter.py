@@ -16,6 +16,19 @@ from sshconfig_to_ananta.ssh_config_converter import (
 
 
 class TestSSHConfigConverter(unittest.TestCase):
+    def _convert_from_text(self, text: str) -> list:
+        """Helper function to convert SSH config text to hosts."""
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as tf:
+            tf.write(text)
+            tf.flush()
+            path = Path(tf.name)
+        try:
+            return convert_to_ananta_hosts(path, None)
+        finally:
+            path.unlink(missing_ok=True)
+
     def test_parse_valid_line(self):
         self.assertEqual(_parse_valid_line("Host myserver"), ("host", "myserver"))
         self.assertIsNone(_parse_valid_line("# Comment line"))
@@ -130,7 +143,9 @@ Host Disabled-Host--Must-at-Last
             self.assertEqual(len(result), 0)
 
         # Check that warning was logged
-        self.assertIn("SSH config file could not be found", log.output[0])
+        self.assertTrue(
+            any("SSH config file could not be found" in m for m in log.output)
+        )
 
     def test_read_ssh_config_generic_exception(self):
         """Test _read_ssh_config with generic Exception."""
@@ -143,7 +158,7 @@ Host Disabled-Host--Must-at-Last
                 self.assertEqual(len(result), 0)
 
         # Check that error was logged
-        self.assertIn("Failed to read SSH config file", log.output[0])
+        self.assertTrue(any("Failed to read SSH config file" in m for m in log.output))
 
     def test_convert_to_ananta_hosts_wildcard_host(self):
         """Test convert_to_ananta_hosts with wildcard host names."""
@@ -286,6 +301,34 @@ Host test-host
                     log.output[0],
                 )
 
+            finally:
+                temp_file.close()
+                Path(temp_file.name).unlink()
+
+    def test_convert_to_ananta_hosts_proxyjump_warning(self):
+        """Test convert_to_ananta_hosts with proxy jump (should trigger warning)."""
+        # Create test SSH config with proxy jump
+        ssh_config_content = """
+Host jumpy
+    HostName 10.0.0.5
+    User admin
+    ProxyJump bastion.example.com
+"""
+        # Create temporary file
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_file:
+            temp_file.write(ssh_config_content)
+            temp_file.flush()
+            try:
+                # Capture logging output
+                with self.assertLogs(level="WARNING") as log:
+                    hosts = convert_to_ananta_hosts(Path(temp_file.name), None)
+                # Should have one host with modified alias
+                self.assertEqual(len(hosts), 1)
+                self.assertEqual(hosts[0].alias, "jumpy-needs-proxy")
+                # Check that proxy warning was logged
+                self.assertTrue(any("ProxyCommand/ProxyJump" in m for m in log.output))
             finally:
                 temp_file.close()
                 Path(temp_file.name).unlink()
