@@ -74,7 +74,7 @@ src/sshconfig_to_ananta/
 ```
 
 ## Configuration
-- **pyproject.toml**: PDM-based Python packaging with optional toml-w dependency
+- **pyproject.toml**: PDM-based Python packaging with optional tomli-w dependency
 - **.pre-commit-config.yaml**: Pre-commit hooks for code quality
 - **Dockerfile**: Multi-stage build with uv package manager
 - **GitHub Actions**: CI/CD for testing, linting, and PyPI publishing
