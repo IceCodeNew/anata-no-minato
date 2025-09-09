@@ -65,8 +65,8 @@ class TestMain(unittest.TestCase):
             with patch.object(sys, "argv", test_args):
                 main()
 
-            # Verify convert_to_ananta_hosts was called
-            mock_convert.assert_called_once()
+            # Verify convert_to_ananta_hosts was called with defaults
+            mock_convert.assert_called_once_with(Path.home() / ".ssh" / "config", None)
 
             # Verify file was opened for writing
             mock_file.assert_called_once_with(temp_path, "w", encoding="utf-8")
@@ -101,6 +101,8 @@ class TestMain(unittest.TestCase):
 
             # Verify toml dump was called
             mock_tomli_w.dump.assert_called_once()
+            # Verify TOML file is opened in binary mode
+            mock_file.assert_called_once_with(temp_path, "wb")
 
         finally:
             # Clean up
@@ -264,6 +266,85 @@ class TestMain(unittest.TestCase):
                 if temp_path.exists():
                     temp_path.unlink()
 
+    @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
+    def test_main_relocate_path_is_file(self, mock_convert):
+        """Test main function when relocate path is a file, not directory."""
+        # Mock the convert function to return empty list
+        mock_convert.return_value = []
 
-if __name__ == "__main__":
-    unittest.main()
+        # Create a temporary file (not directory)
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+            temp_path = Path(temp_file.name)
+
+        # Create another temporary file for output
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as output_file:
+            output_path = Path(output_file.name)
+
+        try:
+            # Mock sys.argv with file path as relocate
+            test_args = ["main.py", "--relocate", str(temp_path), str(output_path)]
+            with patch.object(sys, "argv", test_args):
+                with self.assertRaises(NotADirectoryError):
+                    main()
+
+        finally:
+            # Clean up
+            if temp_path.exists():
+                temp_path.unlink()
+            if output_path.exists():
+                output_path.unlink()
+
+    @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
+    @patch("sshconfig_to_ananta.main.tomli_w", None)
+    @patch("builtins.open", new_callable=mock_open)
+    def test_main_module_execution(self, mock_file, mock_convert):
+        """Test main function when module is executed directly."""
+        # Mock the convert function to return empty list
+        mock_convert.return_value = []
+
+        # Create a temporary file for testing
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+            temp_path = Path(temp_file.name)
+
+        try:
+            # Mock sys.argv
+            test_args = ["main.py", str(temp_path)]
+            with patch.object(sys, "argv", test_args):
+                # Import and run main function
+                from sshconfig_to_ananta.main import main
+
+                main()
+
+            # Verify convert_to_ananta_hosts was called
+            mock_convert.assert_called_once()
+
+        finally:
+            # Clean up
+            if temp_path.exists():
+                temp_path.unlink()
+
+    def test_toml_import_error_handling(self):
+        """Test that toml import error is handled gracefully."""
+        # Test that the code handles ImportError when tomli_w is not available
+        import sys
+        from unittest.mock import patch
+
+        # Remove tomli_w from sys.modules if it exists
+        original_modules = sys.modules.copy()
+        modules_to_remove = [k for k in sys.modules.keys() if "tomli" in k]
+        for module in modules_to_remove:
+            if module in sys.modules:
+                del sys.modules[module]
+
+        try:
+            # Force ImportError when importing tomli_w
+            with patch.dict("sys.modules", {"tomli_w": None}):
+                # Import should work without error
+                import sshconfig_to_ananta.main
+
+                # The module should handle the ImportError gracefully
+                self.assertTrue(hasattr(sshconfig_to_ananta.main, "main"))
+        finally:
+            # Restore original modules
+            sys.modules.clear()
+            sys.modules.update(original_modules)
