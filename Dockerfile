@@ -24,7 +24,7 @@ RUN --mount=type=bind,source=README.md,target=/home/nonroot/sshconfig_to_ananta/
 
 
 FROM mirror.gcr.io/icecodexi/bash-toybox:latest AS assets
-FROM gcr.io/distroless/python3:latest
+FROM gcr.io/distroless/python3-debian12:latest
 ARG ver_anata_helper
 LABEL org.opencontainers.image.version="${ver_anata_helper}" \
       org.opencontainers.image.source="https://github.com/IceCodeNew/anata-no-minato"
