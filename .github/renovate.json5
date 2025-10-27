@@ -9,6 +9,7 @@
     // ":pinDevDependencies",
     "security:openssf-scorecard",
     "customManagers:dockerfileVersions",
+    "group:allNonMajor",
   ],
   "customManagers": [
     {
