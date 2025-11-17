@@ -9,6 +9,9 @@ from unittest.mock import mock_open, patch
 
 from sshconfig_to_ananta.main import main, parse_arguments
 
+# Scope open patching to the module under test to avoid https://github.com/coveragepy/coveragepy/issues/2083
+MAIN_OPEN_TARGET = "sshconfig_to_ananta.main.open"
+
 
 class TestMain(unittest.TestCase):
     def test_parse_arguments_defaults(self):
@@ -49,7 +52,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w", None)
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_csv_output(self, mock_file, mock_convert):
         """Test main function with CSV output."""
         # Mock the convert function to return empty list
@@ -80,7 +83,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w")
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_toml_output(self, mock_file, mock_tomli_w, mock_convert):
         """Test main function with TOML output."""
         # Mock the convert function to return empty list
@@ -115,7 +118,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w")
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_auto_add_toml_extension(self, mock_file, mock_tomli_w, mock_convert):
         """Test main function auto-adds .toml extension when toml_w is available."""
         # Mock the convert function to return empty list
@@ -144,7 +147,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w", None)
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_csv_output_no_toml_extension_change(self, mock_file, mock_convert):
         """Test main function doesn't change extension when toml_w is not available."""
         # Mock the convert function to return empty list
@@ -197,7 +200,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w", None)
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_write_exception(self, mock_file, mock_convert):
         """Test main function handles file write exception."""
         # Mock the convert function to return empty list
@@ -242,7 +245,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w", None)
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_relocate_directory_exists(self, mock_file, mock_convert):
         """Test main function with existing relocate directory."""
         # Mock the convert function to return empty list
@@ -300,7 +303,7 @@ class TestMain(unittest.TestCase):
 
     @patch("sshconfig_to_ananta.main.convert_to_ananta_hosts")
     @patch("sshconfig_to_ananta.main.tomli_w", None)
-    @patch("builtins.open", new_callable=mock_open)
+    @patch(MAIN_OPEN_TARGET, new_callable=mock_open)
     def test_main_module_execution(self, mock_file, mock_convert):
         """Test main function when module is executed directly."""
         # Mock the convert function to return empty list
