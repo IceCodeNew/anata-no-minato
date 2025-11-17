@@ -152,7 +152,10 @@ Host Disabled-Host--Must-at-Last
         from unittest.mock import patch
 
         # Create a mock file that raises an exception
-        with patch("builtins.open", side_effect=Exception("Permission denied")):
+        with patch(
+            "sshconfig_to_ananta.ssh_config_converter.open",
+            side_effect=Exception("Permission denied"),
+        ):
             with self.assertLogs(level="ERROR") as log:
                 result = list(_read_ssh_config(Path("/some/path")))
                 self.assertEqual(len(result), 0)
