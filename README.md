@@ -14,7 +14,7 @@
 This project is an attempt to packaging the [Ananta](https://github.com/cwt/ananta) with its runtime into a minimum, hardened docker image, while also providing a convenient way to use it.  
 It is recommended to bind mount the `${HOME}/.ssh/` into the container, and the container will automatically generate `hosts.toml` based on `~/.ssh/config` for you.  
   
-Since it is routine for me to spend lot of my labour hours in an air-gapped environment, a docker image seems to be the best way to package some of my favourite tools.  
+Since it is routine for me to spend a lot of my labor hours in an air-gapped environment, a docker image seems to be the best way to package some of my favorite tools.
 
 ## How to start
 
