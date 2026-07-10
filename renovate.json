@@ -16,19 +16,36 @@
     "group:allNonMajor",
     "group:githubArtifactActions",
     "group:linters",
-    "schedule:earlyMondays",
     "security:openssf-scorecard"
   ],
-  "ignorePresets": ["docker:pinDigests"],
   "packageRules": [
     {
-      // MUST have a matching criteria
       "matchPackageNames": ["*"],
-
-      // followed by the actions. Both the matching and actions are mandatory.
       "minimumReleaseAge": "3 days",
       "internalChecksFilter": "strict"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["digest"],
+      "matchDatasources": ["docker"],
+      "minimumReleaseAge": null,
+      "ignoreTests": true,
+      "automerge": true
+    },
+    {
+      "description": "Batch repository-produced image digest updates to reduce self-triggering build loops.",
+      "matchUpdateTypes": ["digest"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["/\\/icecodexi\\//"],
+      "minimumReleaseAge": "12 hours",
+      "schedule": ["after 12am and before 1am", "after 12pm and before 1pm"],
+      "automerge": true
     }
   ],
+  "automergeType": "branch",
   "timezone": "Asia/Shanghai"
 }
