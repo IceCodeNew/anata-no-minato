@@ -15,7 +15,7 @@ Anata-no-minato is a Docker packaging of [Ananta](https://github.com/cwt/ananta)
 - `pdm sync` - Sync environment with lock file
 
 ### Code Quality
-- `pre-commit run --all-files` - Run all pre-commit hooks
+- `prek run --all-files` - Run all pre-commit hooks
 - `ruff check` - Run linter
 - `ruff format` - Format code
 - `ruff check --fix` - Auto-fix linting issues
@@ -75,7 +75,7 @@ src/sshconfig_to_ananta/
 
 ## Configuration
 - **pyproject.toml**: PDM-based Python packaging with optional tomli-w dependency
-- **.pre-commit-config.yaml**: Pre-commit hooks for code quality
+- **prek.toml**: Pre-commit hooks for code quality (prek)
 - **Dockerfile**: Multi-stage build with uv package manager
 - **GitHub Actions**: CI/CD for testing, linting, and PyPI publishing
 
