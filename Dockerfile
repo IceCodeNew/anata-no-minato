@@ -1,7 +1,7 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1@sha256:87999aa3d42bdc6bea60565083ee17e86d1f3339802f543c0d03998580f9cb89
 
-FROM ghcr.io/astral-sh/uv:latest AS distroless-uv
-FROM mirror.gcr.io/icecodexi/python:debian12-nonroot AS uv
+FROM ghcr.io/astral-sh/uv:latest@sha256:0f36cb9361a3346885ca3677e3767016687b5a170c1a6b88465ec14aefec90aa AS distroless-uv
+FROM mirror.gcr.io/icecodexi/python:debian12-nonroot@sha256:64d3b4434324068026d02704f8efeab8d518f091d55a0112ae915c553240c2b4 AS uv
 COPY --link --from=distroless-uv /uv /uvx \
     /usr/local/bin/
 ENV PATH="/home/nonroot/.local/bin:${PATH}" \
@@ -23,8 +23,8 @@ RUN --mount=type=bind,source=README.md,target=/home/nonroot/sshconfig_to_ananta/
         /home/nonroot/sshconfig_to_ananta/
 
 
-FROM mirror.gcr.io/icecodexi/bash-toybox:debian12 AS assets
-FROM gcr.io/distroless/python3-debian12:latest
+FROM mirror.gcr.io/icecodexi/bash-toybox:debian12@sha256:40ca19e19f3e575ae3760d7d114b5a7d435ffdc2e9ae41273f819cce277f59df AS assets
+FROM gcr.io/distroless/python3-debian12:latest@sha256:2fdb05402a2cf21cf78fdb3ba4c5db167241e9e498140f5bf689d7efb773731f
 ARG ver_anata_helper
 LABEL org.opencontainers.image.version="${ver_anata_helper}" \
       org.opencontainers.image.source="https://github.com/IceCodeNew/anata-no-minato"
