@@ -3,20 +3,26 @@ permissions: {}
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
+      - "renovate/**"
     paths:
-    - '.github/workflows/unittest.yml'
-    - 'sshconfig_to_ananta/**'
-    - 'tests/**'
-    - 'pdm.lock'
-    - 'pyproject.toml'
+      - '.github/workflows/unittest.yml'
+      - 'sshconfig_to_ananta/**'
+      - 'tests/**'
+      - 'pdm.lock'
+      - 'pyproject.toml'
   pull_request:
     paths:
-    - '.github/workflows/unittest.yml'
-    - 'sshconfig_to_ananta/**'
-    - 'tests/**'
-    - 'pdm.lock'
-    - 'pyproject.toml'
+      - '.github/workflows/unittest.yml'
+      - 'sshconfig_to_ananta/**'
+      - 'tests/**'
+      - 'pdm.lock'
+      - 'pyproject.toml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   test:

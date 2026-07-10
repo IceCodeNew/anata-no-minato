@@ -3,32 +3,31 @@ permissions: {}
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
     paths:
-    - '.github/workflows/ananta.yml'
-    - 'script/dummy_ananta.sh'
-    - 'sshconfig_to_ananta/**'
-    - 'tests/**'
-    - '.ananta_version'
-    - '.dockerignore'
-    - 'docker-entrypoint.sh'
-    - 'Dockerfile'
-    - 'pdm.lock'
-    - 'pyproject.toml'
+      - '.github/workflows/ananta.yml'
+      - 'script/dummy_ananta.sh'
+      - 'sshconfig_to_ananta/**'
+      - 'tests/**'
+      - '.ananta_version'
+      - '.dockerignore'
+      - 'docker-entrypoint.sh'
+      - 'Dockerfile'
+      - 'pdm.lock'
+      - 'pyproject.toml'
   pull_request:
     paths:
-    - '.github/workflows/ananta.yml'
-    - 'script/dummy_ananta.sh'
-    - 'sshconfig_to_ananta/**'
-    - 'tests/**'
-    - '.ananta_version'
-    - '.dockerignore'
-    - 'docker-entrypoint.sh'
-    - 'Dockerfile'
-    - 'pdm.lock'
-    - 'pyproject.toml'
-  schedule:
-  - cron: "0 5 1-31/10 * *"
+      - '.github/workflows/ananta.yml'
+      - 'script/dummy_ananta.sh'
+      - 'sshconfig_to_ananta/**'
+      - 'tests/**'
+      - '.ananta_version'
+      - '.dockerignore'
+      - 'docker-entrypoint.sh'
+      - 'Dockerfile'
+      - 'pdm.lock'
+      - 'pyproject.toml'
   workflow_dispatch:
 
 env:
