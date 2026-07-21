@@ -18,7 +18,13 @@
 
 ## 如何开始
 
-在当前系统上安装 `ananta` 的帮助脚本：
+如果您只想将 `~/.ssh/config` 转换为 `hosts.toml` 文件，请执行以下命令：
+
+```shell
+uvx --from sshconfig_to_ananta[toml] sshconfig_to_ananta --ssh ~/.ssh/config hosts.toml
+```
+
+这个项目还提供了一个包装脚本来简化上游 [Ananta](https://github.com/cwt/ananta) 的使用：
 
 ```shell
 curl -sSLROJ --fail -- \
