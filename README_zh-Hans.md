@@ -47,7 +47,7 @@ ananta -CS fastfetch
 如果您不需要上述功能，可使用和上游一致的参数顺序来指定 hosts.toml 文件，如下所示：  
 
 ```shell
-ananta -t arch hosts.toml sudo pacman -Syu --noconfirm
+hosts_path=$(realpath hosts.toml) && ananta -t arch "$hosts_path" sudo pacman -Syu --noconfirm
 ```
 
 ## 关于 SSH 配置文件的高级玩法

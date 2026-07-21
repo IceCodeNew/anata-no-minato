@@ -48,7 +48,7 @@ In case you want to specify an existing hosts.toml,
    issue the command with the same arguments sequence as the original ananta command:  
 
 ```shell
-ananta -t arch hosts.toml sudo pacman -Syu --noconfirm
+hosts_path=$(realpath hosts.toml) && ananta -t arch "$hosts_path" sudo pacman -Syu --noconfirm
 ```
 
 ## Hacking SSH Config for Ananta
