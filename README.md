@@ -18,7 +18,13 @@ Since it is routine for me to spend a lot of my labor hours in an air-gapped env
 
 ## How to start
 
-Install the `ananta` helper script:
+To convert your `~/.ssh/config` into `hosts.toml`:
+
+```shell
+uvx --from sshconfig_to_ananta[toml] sshconfig_to_ananta --ssh ~/.ssh/config hosts.toml
+```
+
+This project also provides a wrapper easing the further usage of the [upstream](https://github.com/cwt/ananta):
 
 ```shell
 curl -sSLROJ --fail -- \
