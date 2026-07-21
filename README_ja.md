@@ -49,7 +49,7 @@ ananta -CS fastfetch
 実行例：  
 
 ```shell
-ananta -t arch hosts.toml sudo pacman -Syu --noconfirm
+ananta -t arch "$(realpath hosts.toml)" sudo pacman -Syu --noconfirm
 ```
 
 ## Ananta 用の SSH config 活用術

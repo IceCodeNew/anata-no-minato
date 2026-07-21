@@ -16,7 +16,7 @@ This helper script will automatically generate hosts file based on `~/.ssh/confi
 
 In case you want to specify an existing hosts file,
    issue the command with the same arguments sequence as the original ananta command:
-`ananta -t arch hosts.toml sudo pacman -Syu --noconfirm`
+`ananta -t arch "$(realpath hosts.toml)" sudo pacman -Syu --noconfirm`
 '
         exit 0
         ;;
