@@ -1,7 +1,7 @@
 # syntax=mirror.gcr.io/docker/dockerfile:1.25.0@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 
 FROM ghcr.io/astral-sh/uv:0.11.28@sha256:0f36cb9361a3346885ca3677e3767016687b5a170c1a6b88465ec14aefec90aa AS distroless-uv
-FROM mirror.gcr.io/icecodexi/python:debian-nonroot@sha256:fb7ee0077bc10b29bed50585d077c607d6d261ef20dcd7e01c0013d0a017feb0 AS uv
+FROM mirror.gcr.io/icecodexi/python:debian-nonroot@sha256:8bd13915045b9fe203c8801f89f1c601ac69223a1350ff8e39d94f97fffbfc88 AS uv
 COPY --link --from=distroless-uv /uv /uvx \
     /usr/local/bin/
 ENV PATH="/home/nonroot/.local/bin:${PATH}" \
