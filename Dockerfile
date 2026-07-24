@@ -23,7 +23,7 @@ RUN --mount=type=bind,source=README.md,target=/home/nonroot/sshconfig_to_ananta/
         /home/nonroot/sshconfig_to_ananta/
 
 
-FROM mirror.gcr.io/icecodexi/bash-toybox:0.8.14@sha256:c128afea685ae81fd67e7f3578a0d0e20f7c1dc54addb8b6e0e64e80d91306c2 AS assets
+FROM mirror.gcr.io/icecodexi/bash-toybox:0.8.14@sha256:e10a18dc2c3c37bb7abda29b9f05479d65fdd08563fd95ebafb5e958e5435cea AS assets
 FROM gcr.io/distroless/python3-debian13:latest@sha256:3f056d8b0189540a15b5a3a125cfd28fb0960af0af2c56cf8bcec613fd771a00
 ARG ver_anata_helper
 LABEL org.opencontainers.image.version="${ver_anata_helper}" \
