@@ -61,8 +61,8 @@ def main():
     # ssh_path will be valided in convert_to_ananta_hosts()
     try:
         ananta_hosts = convert_to_ananta_hosts(ssh_path, relocate)
-    except Exception:  # noqa: BLE001
-        logger.error("Failed to convert SSH config to Ananta hosts")
+    except Exception:
+        logger.exception("Failed to convert SSH config to Ananta hosts")
         sys.exit(1)
 
     try:

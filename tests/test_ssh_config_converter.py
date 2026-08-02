@@ -53,7 +53,9 @@ class TestSSHConfigConverter(unittest.TestCase):
         self.assertEqual(_process_proxy_warning(alias), "myserver-needs-proxy")
 
     def test_convert_to_ananta_hosts(self):
-        with tempfile.NamedTemporaryFile(mode="w+") as temp_ssh_config:
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".config"
+        ) as temp_ssh_config:
             temp_ssh_config.write("""
 Host minimum_config
     HostName 192.168.1.100
@@ -86,7 +88,12 @@ Host Disabled-Host--Must-at-Last
 """)
 
             temp_ssh_config.flush()
-            hosts = convert_to_ananta_hosts(Path(temp_ssh_config.name), None)
+            ssh_config_path = Path(temp_ssh_config.name)
+
+        try:
+            hosts = convert_to_ananta_hosts(ssh_config_path, None)
+        finally:
+            ssh_config_path.unlink(missing_ok=True)
 
         self.assertEqual(len(hosts), 4)
 

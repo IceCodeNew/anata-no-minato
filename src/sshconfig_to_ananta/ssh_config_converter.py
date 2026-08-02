@@ -20,8 +20,8 @@ def _read_ssh_config(ssh_path: Path) -> Iterator[str]:
             f"SSH config file could not be found in: {ssh_path}, hosts file could not be generated. "
             "To proceed, make sure you have provided a valid hosts file. "
         )
-    except Exception:  # noqa: BLE001
-        logger.error(f"Failed to read SSH config file at {ssh_path}")
+    except Exception:
+        logger.exception(f"Failed to read SSH config file at {ssh_path}")
 
 
 def _parse_valid_line(line: str) -> tuple[str, str] | None:
