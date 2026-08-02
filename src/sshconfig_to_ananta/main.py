@@ -6,11 +6,12 @@ import logging
 import sys
 from pathlib import Path
 from types import ModuleType
-from typing import Optional
 
 from sshconfig_to_ananta.ssh_config_converter import convert_to_ananta_hosts
 
-tomli_w: Optional[ModuleType] = None
+logger = logging.getLogger(__name__)
+
+tomli_w: ModuleType | None = None
 try:
     import tomli_w
 except ImportError:
@@ -60,8 +61,8 @@ def main():
     # ssh_path will be valided in convert_to_ananta_hosts()
     try:
         ananta_hosts = convert_to_ananta_hosts(ssh_path, relocate)
-    except Exception as e:
-        logging.error("Failed to convert SSH config to Ananta hosts: %s", e)
+    except Exception:  # noqa: BLE001
+        logger.error("Failed to convert SSH config to Ananta hosts")
         sys.exit(1)
 
     try:
@@ -76,9 +77,9 @@ def main():
                 file.writelines(
                     host.dump_comma_separated_str() for host in ananta_hosts
                 )
-        logging.info("Successfully wrote Ananta hosts to %s.", server_list)
-    except Exception as e:
-        logging.exception("Failed to write to %s: %s", server_list, e)
+        logger.info("Successfully wrote Ananta hosts to %s.", server_list)
+    except Exception:
+        logger.exception("Failed to write to %s", server_list)
         raise
 
 

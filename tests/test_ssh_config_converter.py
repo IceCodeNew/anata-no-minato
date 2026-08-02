@@ -53,8 +53,8 @@ class TestSSHConfigConverter(unittest.TestCase):
         self.assertEqual(_process_proxy_warning(alias), "myserver-needs-proxy")
 
     def test_convert_to_ananta_hosts(self):
-        temp_ssh_config = tempfile.NamedTemporaryFile(mode="w+")
-        temp_ssh_config.write("""
+        with tempfile.NamedTemporaryFile(mode="w+") as temp_ssh_config:
+            temp_ssh_config.write("""
 Host minimum_config
     HostName 192.168.1.100
 
@@ -85,9 +85,9 @@ Host Disabled-Host--Must-at-Last
     #tags dummy,!ananta,test
 """)
 
-        temp_ssh_config.flush()
-        hosts = convert_to_ananta_hosts(Path(temp_ssh_config.name), None)
-        temp_ssh_config.close()
+            temp_ssh_config.flush()
+            hosts = convert_to_ananta_hosts(Path(temp_ssh_config.name), None)
+
         self.assertEqual(len(hosts), 4)
 
         minimum_config = [host for host in hosts if host.alias == "minimum_config"]
@@ -152,13 +152,15 @@ Host Disabled-Host--Must-at-Last
         from unittest.mock import patch
 
         # Create a mock file that raises an exception
-        with patch(
-            "sshconfig_to_ananta.ssh_config_converter.open",
-            side_effect=Exception("Permission denied"),
+        with (
+            patch(
+                "sshconfig_to_ananta.ssh_config_converter.open",
+                side_effect=Exception("Permission denied"),
+            ),
+            self.assertLogs(level="ERROR") as log,
         ):
-            with self.assertLogs(level="ERROR") as log:
-                result = list(_read_ssh_config(Path("/some/path")))
-                self.assertEqual(len(result), 0)
+            result = list(_read_ssh_config(Path("/some/path")))
+            self.assertEqual(len(result), 0)
 
         # Check that error was logged
         self.assertTrue(any("Failed to read SSH config file" in m for m in log.output))
