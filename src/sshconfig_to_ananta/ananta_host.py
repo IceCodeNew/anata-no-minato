@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # pyright: strict
 
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from pathlib import Path
-from typing import Any, Iterator, List, Literal, Optional, overload
+from typing import TypeAlias
+
+HostValue: TypeAlias = str | int | list[str]
 
 
-class AnantaHost(Mapping[str, Any]):
+class AnantaHost(Mapping[str, HostValue]):
     """Represents an Ananta host entry.
 
     This class stores the configuration details for connecting to a host
@@ -35,7 +37,7 @@ class AnantaHost(Mapping[str, Any]):
     port: int
     username: str
     key_path: str
-    tags: List[str]
+    tags: list[str]
 
     def __init__(
         self,
@@ -44,8 +46,8 @@ class AnantaHost(Mapping[str, Any]):
         port: str,
         username: str,
         key_path: str,
-        tags: List[str],
-        relocate: Optional[Path],
+        tags: list[str],
+        relocate: Path | None,
     ):
         if not alias:
             raise ValueError("ERROR: alias cannot be empty.")
@@ -86,25 +88,7 @@ class AnantaHost(Mapping[str, Any]):
             "tags": self.tags,
         }
 
-    @overload
-    def __getitem__(self, key: Literal["alias"]) -> str: ...
-
-    @overload
-    def __getitem__(self, key: Literal["ip"]) -> str: ...
-
-    @overload
-    def __getitem__(self, key: Literal["port"]) -> int: ...
-
-    @overload
-    def __getitem__(self, key: Literal["username"]) -> str: ...
-
-    @overload
-    def __getitem__(self, key: Literal["key_path"]) -> str: ...
-
-    @overload
-    def __getitem__(self, key: Literal["tags"]) -> List[str]: ...
-
-    def __getitem__(self, key: str) -> Any:
+    def __getitem__(self, key: str) -> HostValue:
         return self._data[key]
 
     def __iter__(self) -> Iterator[str]:
@@ -125,6 +109,6 @@ class AnantaHost(Mapping[str, Any]):
             parts.append(":".join(self.tags))
         return ",".join(parts) + "\n"
 
-    def dump_host_info(self) -> Mapping[str, Any]:
+    def dump_host_info(self) -> Mapping[str, HostValue]:
         host_info = {k: v for k, v in self._data.items() if k != "alias" and v}
         return host_info

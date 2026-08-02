@@ -12,17 +12,18 @@ class TestMainModule(unittest.TestCase):
         # Mock sys.argv with test arguments
         test_args = ["__main__.py", "test_output.csv"]
 
-        with patch.object(sys, "argv", test_args):
-            # Mock the main function to avoid actual execution
-            with patch("sshconfig_to_ananta.main.main", return_value=None) as mock_main:
-                # Import the __main__ module - this should not execute main()
-                # because __name__ won't be "__main__" when imported as a module
-                import sshconfig_to_ananta.__main__
+        with (
+            patch.object(sys, "argv", test_args),
+            patch("sshconfig_to_ananta.main.main", return_value=None) as mock_main,
+        ):
+            # Import the __main__ module - this should not execute main()
+            # because __name__ won't be "__main__" when imported as a module
+            import sshconfig_to_ananta.__main__
 
-                # Verify the import worked
-                self.assertTrue(hasattr(sshconfig_to_ananta.__main__, "main"))
-                # main() should not have been called during import
-                mock_main.assert_not_called()
+            # Verify the import worked
+            self.assertTrue(hasattr(sshconfig_to_ananta.__main__, "main"))
+            # main() should not have been called during import
+            mock_main.assert_not_called()
 
     def test_main_module_imports(self):
         """Test that __main__.py can be imported without errors."""

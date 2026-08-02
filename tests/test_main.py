@@ -207,7 +207,7 @@ class TestMain(unittest.TestCase):
         mock_convert.return_value = []
 
         # Mock open to raise an exception
-        mock_file.side_effect = IOError("Write failed")
+        mock_file.side_effect = OSError("Write failed")
 
         # Create a temporary file for testing
         with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
@@ -216,9 +216,8 @@ class TestMain(unittest.TestCase):
         try:
             # Mock sys.argv
             test_args = ["main.py", str(temp_path)]
-            with patch.object(sys, "argv", test_args):
-                with self.assertRaises(IOError):
-                    main()
+            with patch.object(sys, "argv", test_args), self.assertRaises(OSError):
+                main()
 
         finally:
             # Clean up
@@ -234,9 +233,11 @@ class TestMain(unittest.TestCase):
         try:
             # Mock sys.argv with non-existent relocate path
             test_args = ["main.py", "--relocate", "/nonexistent/path", str(temp_path)]
-            with patch.object(sys, "argv", test_args):
-                with self.assertRaises(FileNotFoundError):
-                    main()
+            with (
+                patch.object(sys, "argv", test_args),
+                self.assertRaises(FileNotFoundError),
+            ):
+                main()
 
         finally:
             # Clean up
@@ -290,9 +291,11 @@ class TestMain(unittest.TestCase):
         try:
             # Mock sys.argv with file path as relocate
             test_args = ["main.py", "--relocate", str(temp_path), str(output_path)]
-            with patch.object(sys, "argv", test_args):
-                with self.assertRaises(NotADirectoryError):
-                    main()
+            with (
+                patch.object(sys, "argv", test_args),
+                self.assertRaises(NotADirectoryError),
+            ):
+                main()
 
         finally:
             # Clean up
@@ -338,7 +341,7 @@ class TestMain(unittest.TestCase):
 
         # Remove tomli_w from sys.modules if it exists
         original_modules = sys.modules.copy()
-        modules_to_remove = [k for k in sys.modules.keys() if "tomli" in k]
+        modules_to_remove = [k for k in sys.modules if "tomli" in k]
         for module in modules_to_remove:
             if module in sys.modules:
                 del sys.modules[module]

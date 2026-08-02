@@ -3,27 +3,28 @@
 
 import logging
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, List, Optional, Tuple
 
 from sshconfig_to_ananta.ananta_host import AnantaHost
+
+logger = logging.getLogger(__name__)
 
 
 def _read_ssh_config(ssh_path: Path) -> Iterator[str]:
     try:
         with open(ssh_path, "r", encoding="utf-8") as file:
-            for line in file:
-                yield line
+            yield from file
     except FileNotFoundError:
-        logging.warning(
+        logger.warning(
             f"SSH config file could not be found in: {ssh_path}, hosts file could not be generated. "
             "To proceed, make sure you have provided a valid hosts file. "
         )
-    except Exception as e:
-        logging.error(f"Failed to read SSH config file at {ssh_path}: {e}")
+    except Exception:
+        logger.exception(f"Failed to read SSH config file at {ssh_path}")
 
 
-def _parse_valid_line(line: str) -> Optional[Tuple[str, str]]:
+def _parse_valid_line(line: str) -> tuple[str, str] | None:
     ananta_tags_pattern = re.compile(r"^\s+#tags\s+", re.IGNORECASE)
     comment_pattern = re.compile(r"\s*#.*")
     skip_pattern = re.compile(r"^\s*[#$]")
@@ -45,22 +46,20 @@ def _valid_host(alias: str) -> bool:
     return "*" not in alias and bool(alias.strip())
 
 
-def _host_disabled(tags: List[str]) -> bool:
+def _host_disabled(tags: list[str]) -> bool:
     return any(tag.startswith("!ananta") for tag in tags)
 
 
 def _process_proxy_warning(alias: str) -> str:
-    logging.warning(
+    logger.warning(
         f"SSH host {alias} is configured with ProxyCommand/ProxyJump. "
         "Ananta does not support these configurations currently, which may prevent you from connecting to this host. "
     )
     return f"{alias}-needs-proxy"
 
 
-def convert_to_ananta_hosts(
-    ssh_path: Path, relocate: Optional[Path]
-) -> List[AnantaHost]:
-    ananta_hosts: List[AnantaHost] = []
+def convert_to_ananta_hosts(ssh_path: Path, relocate: Path | None) -> list[AnantaHost]:
+    ananta_hosts: list[AnantaHost] = []
     ssh_lines = _read_ssh_config(ssh_path)
 
     found_header_host = False
