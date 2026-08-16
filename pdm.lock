@@ -4,7 +4,7 @@
 [metadata]
 groups = ["default", "toml"]
 strategy = ["inherit_metadata"]
-lock_version = "4.5.0"
+lock_version = "4.5.1"
 content_hash = "sha256:655221fa9956d4c4fdeaec24bbd06dff3c9caad0fb842c06900b84290748ee96"
 
 [[metadata.targets]]
