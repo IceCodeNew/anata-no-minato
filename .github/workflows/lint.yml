@@ -11,11 +11,18 @@ on:
     pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
   build:
+    # Same-repository Renovate PRs use the checks from the push run for the
+    # identical SHA. Fork PRs still need pull_request checks because their
+    # branches do not produce push events in this repository.
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name != github.repository ||
+      !startsWith(github.head_ref, 'renovate/')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -39,14 +46,19 @@ jobs:
       uses: reviewdog/action-hadolint@2d0eb7c86a0ddd94eb625485f4cc2730e105edd8 # v1.53.0
       with:
         hadolint_ignore: DL3007 SC2114
-        reporter: github-check
+        # A new push branch has no pull-request diff for reviewdog to filter,
+        # so report annotations only from pull_request runs. The action still
+        # executes hadolint in the authoritative Renovate push job.
+        reporter: ${{ github.event_name == 'pull_request' && 'github-check' || 'local' }}
+        filter_mode: ${{ github.event_name == 'pull_request' && 'added' || 'nofilter' }}
 
     # misspell
     - name: misspell
       uses: reviewdog/action-misspell@d6429416b12b09b4e2768307d53bef58d172e962 # v1.27.0
       with:
         locale: "US"
-        reporter: github-check
+        reporter: ${{ github.event_name == 'pull_request' && 'github-check' || 'local' }}
+        filter_mode: ${{ github.event_name == 'pull_request' && 'added' || 'nofilter' }}
     # AutoCorrect
     - name: AutoCorrect
       uses: huacnlee/autocorrect-action@bf91ab3904c2908dd8e71312a8a83ed1eb632997 # main
