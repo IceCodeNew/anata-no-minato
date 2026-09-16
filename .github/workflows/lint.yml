@@ -43,7 +43,7 @@ jobs:
         ruff check .
     # Dockerfile lint
     - name: hadolint
-      uses: reviewdog/action-hadolint@2d0eb7c86a0ddd94eb625485f4cc2730e105edd8 # v1.53.0
+      uses: reviewdog/action-hadolint@9d9a44af664599d7fe5ed5ee3d66d2d236cb7f8f # v1.54.0
       with:
         hadolint_ignore: DL3007 SC2114
         # A new push branch has no pull-request diff for reviewdog to filter,
@@ -54,7 +54,7 @@ jobs:
 
     # misspell
     - name: misspell
-      uses: reviewdog/action-misspell@ba7ac4030fa6812f8c8b2d4e516af8bc99553c32 # v1.28.0
+      uses: reviewdog/action-misspell@da40ce414be6ce320a9322aa2bae10bd3b9e6ef3 # v1.29.0
       with:
         locale: "US"
         reporter: ${{ github.event_name == 'pull_request' && 'github-check' || 'local' }}
